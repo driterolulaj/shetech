@@ -60,3 +60,6 @@ export function createApp() {
 
   return app
 }
+
+/** Vercel serves this default export as a function; src/server.js listens with it everywhere else. */
+export default createApp()

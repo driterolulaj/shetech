@@ -21,8 +21,11 @@ export const config = {
   /** Frontend origins allowed to call the API from another host (CORS). Empty = same-origin only. */
   corsOrigins: list(env.CORS_ORIGINS),
 
-  /** Set when the API sits behind a reverse proxy (nginx), so client IPs and https are read correctly. */
-  trustProxy: env.TRUST_PROXY ? (/^\d+$/.test(env.TRUST_PROXY) ? Number(env.TRUST_PROXY) : env.TRUST_PROXY) : false,
+  /**
+   * Set when the API sits behind a reverse proxy (nginx), so client IPs and https are read correctly.
+   * On Vercel the edge is that proxy (it overwrites X-Forwarded-For with the real client IP), so it defaults to 1 there.
+   */
+  trustProxy: env.TRUST_PROXY ? (/^\d+$/.test(env.TRUST_PROXY) ? Number(env.TRUST_PROXY) : env.TRUST_PROXY) : env.VERCEL ? 1 : false,
 
   db: {
     host: env.DB_HOST || '127.0.0.1',
@@ -31,6 +34,15 @@ export const config = {
     password: env.DB_PASSWORD || '',
     database: env.DB_NAME || 'shetech',
     connectionLimit: Number(env.DB_POOL_SIZE) || 10,
+    /**
+     * TLS, required by hosted databases (TiDB Cloud, Aiven…). DB_SSL=true verifies against the
+     * system CAs; DB_SSL_CA holds the provider's CA certificate (PEM) when it uses its own.
+     */
+    ssl:
+      env.DB_SSL === 'true' || env.DB_SSL_CA
+        ? // A PEM pasted into one line has literal \n sequences
+          { minVersion: 'TLSv1.2', rejectUnauthorized: true, ...(env.DB_SSL_CA && { ca: env.DB_SSL_CA.replace(/\\n/g, '\n') }) }
+        : undefined,
   },
 
   mail: {

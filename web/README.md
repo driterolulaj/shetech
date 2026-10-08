@@ -31,7 +31,7 @@ Copy `.env.example` to `.env.local` and fill in what you have. Everything here e
 
 Other settings (response time, call length) live in `src/config/site.js`.
 
-**Deploying:** the website and API can share a machine or live on separate ones. See *Running the website and API on separate machines* in [`api/README.md`](../api/README.md) for the nginx setup.
+**Deploying:** on Vercel, the root `vercel.json` deploys the website and API together: see *Deploying to Vercel* in [`api/README.md`](../api/README.md). On your own servers, the website and API can share a machine or live on separate ones. See *Running the website and API on separate machines* in [`api/README.md`](../api/README.md) for the nginx setup.
 
 ## Bookings admin (`/admin`)
 

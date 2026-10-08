@@ -1,3 +1,4 @@
+import { attachDatabasePool } from '@vercel/functions'
 import mysql from 'mysql2/promise'
 import { config } from '../config.js'
 
@@ -15,6 +16,10 @@ export const pool = mysql.createPool({
 })
 
 pool.pool.on('connection', (connection) => connection.query("SET time_zone = '+00:00'"))
+
+// On Vercel, close idle connections before a function instance is suspended so they don't pile up on the database
+// (it recognises mysql2's underlying callback pool, not the promise wrapper)
+if (process.env.VERCEL) attachDatabasePool(pool.pool)
 
 /** Runs `work(connection)` in a transaction; commits on success, rolls back on error. */
 export async function transaction(work) {
