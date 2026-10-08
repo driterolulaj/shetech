@@ -1,0 +1,13 @@
+{
+  "onRefresh": true,
+  "everySeconds": 3,
+  "fadeSeconds": 1.5,
+  "exclude": [
+    "calm",
+    "colorblind-blue-yellow",
+    "colorblind-red-green",
+    "dyslexia-friendly",
+    "high-contrast",
+    "purple"
+  ]
+}

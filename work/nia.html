@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nia: contract-to-invoice in minutes | She Tech</title>
+  <meta name="description" content="How She Tech built Nia, an AI platform that reads B2B contracts and automates the entire invoicing schedule.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="container nav" aria-label="Main">
+    <a href="../index.html" class="logo">She<span>Tech</span></a>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+    <ul class="nav-links">
+      <li><a href="../services.html">Services</a></li>
+      <li><a href="../work.html" aria-current="page">Work</a></li>
+      <li><a href="../how-we-work.html">How we work</a></li>
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../contact.html" class="btn btn--primary">Book a call</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <!-- 1. Title + one-line result -->
+  <section class="cs-hero">
+    <div class="container">
+      <a href="../work.html" class="back">← All work</a>
+      <span class="eyebrow" style="display:block">Case study</span>
+      <h1>Nia: contract-to-invoice in minutes, not hours</h1>
+      <p class="lead">An AI-powered platform that reads B2B contracts and sets up the entire invoicing schedule automatically, with the finance team confirming every detail.</p>
+      <ul class="tags" style="margin-top:20px">
+        <li class="tag">AI</li><li class="tag">Document processing</li><li class="tag">Automation</li><li class="tag">B2B SaaS</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Product showcase. TODO: replace these HTML mocks with real screenshots or a short GIF of upload → extracted fields → invoice -->
+  <section class="section--tight">
+    <div class="container">
+      <figure class="cs-showcase" style="margin:0">
+        <div class="mock">
+          <div class="mock__bar"><i></i><i></i><i></i></div>
+          <div class="mock__title">1 · Upload</div>
+          <div class="mock__row"><span>File</span><span>MSA_Acme_2026.pdf</span></div>
+          <div class="mock__row"><span>Pages</span><span>14</span></div>
+          <div class="mock__row"><span>Status</span><span>Reading…</span></div>
+        </div>
+        <div class="mock">
+          <div class="mock__bar"><i></i><i></i><i></i></div>
+          <div class="mock__title">2 · Review terms <span class="mock__badge">Ready</span></div>
+          <div class="mock__row"><span>Parties</span><span>Acme Logistics ↔ Client Co.</span></div>
+          <div class="mock__row"><span>Start / end</span><span>01.01.26 – 31.12.27</span></div>
+          <div class="mock__row"><span>Pricing</span><span>€4,200 / month</span></div>
+          <div class="mock__row"><span>Frequency</span><span>Monthly, net 30</span></div>
+        </div>
+        <div class="mock">
+          <div class="mock__bar"><i></i><i></i><i></i></div>
+          <div class="mock__title">3 · Schedule <span class="mock__badge">Active</span></div>
+          <div class="mock__row"><span>INV-0001</span><span>1 Jan · Sent</span></div>
+          <div class="mock__row"><span>INV-0002</span><span>1 Feb · Sent</span></div>
+          <div class="mock__row"><span>INV-0003</span><span>1 Mar · Scheduled</span></div>
+          <div class="mock__row"><span>…</span><span>24 invoices total</span></div>
+        </div>
+        <figcaption>Upload → review the extracted terms → invoices run on schedule for the life of the contract. (Illustrative data.)</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <!-- 2. Challenge -->
+      <div class="cs-block">
+        <h2>The challenge</h2>
+        <div>
+          <p>B2B companies manage dozens of contracts, each with its own pricing, start and end dates, and billing terms.</p>
+          <p>Finance teams were reading every contract by hand, copying the details into spreadsheets, and building invoices manually. It was slow and repetitive, and invoices were sometimes missed or wrong. Each of those meant revenue the business had earned but didn't collect on time.</p>
+        </div>
+      </div>
+
+      <!-- 3. Solution -->
+      <div class="cs-block">
+        <h2>The solution</h2>
+        <div>
+          <p>We built <strong>Nia</strong>, a platform where a business simply uploads a contract.</p>
+          <p>Nia reads it and extracts the key commercial terms: parties, duration, pricing, start and end dates, and billing frequency. Then it sets up the entire invoicing schedule automatically.</p>
+          <p><strong>The team stays in control.</strong> Nothing is billed until a person has reviewed and confirmed the extracted terms on a single screen.</p>
+        </div>
+      </div>
+
+      <!-- 4. How it works -->
+      <div class="cs-block">
+        <h2>How it works</h2>
+        <div>
+          <ol class="steps steps--5" style="grid-template-columns:1fr">
+            <li class="step"><h3>Upload a contract</h3><p>PDF or Word, straight from your inbox or drive.</p></li>
+            <li class="step"><h3>AI extracts the key terms</h3><p>Parties, dates, pricing and billing frequency, in seconds.</p></li>
+            <li class="step step--human"><h3>Your team reviews &amp; confirms</h3><p>Everything on one screen. Edit anything before it goes live.</p><span class="step__note">Human in the loop</span></li>
+            <li class="step"><h3>Invoices are generated on schedule</h3><p>For the whole life of the contract, with nothing to remember.</p></li>
+            <li class="step"><h3>Each invoice is sent automatically</h3><p>Straight to the client, on time, every time.</p></li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- 5. Results. TODO: replace placeholders with real numbers -->
+      <div class="cs-block">
+        <h2>Results</h2>
+        <div>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__num"><span class="ph">~45 min</span> → <span class="ph">&lt;2 min</span></div>
+              <div class="stat__label">Contract setup time</div>
+            </div>
+            <div class="stat">
+              <div class="stat__num"><span class="ph">0</span></div>
+              <div class="stat__label">Missed invoices</div>
+            </div>
+            <div class="stat">
+              <div class="stat__num"><span class="ph">X</span></div>
+              <div class="stat__label">Contracts processed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Tech & tags -->
+      <div class="cs-block">
+        <h2>Tech &amp; tags</h2>
+        <div>
+          <ul class="tags">
+            <li class="tag">AI</li><li class="tag">Document processing</li><li class="tag">Automation</li><li class="tag">B2B SaaS</li>
+          </ul>
+          <p style="margin-top:16px;color:var(--ink-2)"><span class="ph">Optional: list the stack, e.g. LLM provider, OCR, backend, invoicing/payment integrations.</span></p>
+        </div>
+      </div>
+
+      <!-- 7. Quote. TODO: add a real client or user quote, or delete this block -->
+      <div class="cs-block">
+        <h2>In their words</h2>
+        <blockquote class="quote">
+          <span class="ph">"Quote from a client or user about the time saved or the peace of mind."</span>
+          <cite><span class="ph">Name, Role, Company (or "Head of Finance, a logistics company with 200+ active contracts")</span></cite>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="cta-band">
+        <div>
+          <h2>Still doing this by hand?</h2>
+          <p>If your team is copying data out of documents, let's talk about getting those hours back.</p>
+        </div>
+        <a href="../contact.html" class="btn btn--primary">Book a call</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a href="../index.html" class="logo">She<span>Tech</span></a>
+      <p>AI, automation & custom software.<br>&copy; <span data-year></span> She Tech</p>
+    </div>
+    <ul class="footer-links">
+      <li><a href="../services.html">Services</a></li>
+      <li><a href="../work.html">Work</a></li>
+      <li><a href="../how-we-work.html">How we work</a></li>
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+</body>
+</html>

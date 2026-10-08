@@ -1,0 +1,52 @@
+{
+  "name": "palette-editor",
+  "version": "0.1.0",
+  "description": "Live colour-scheme editor for Vite + React sites: a JSON palette becomes CSS variables, and an in-browser editor previews changes and saves them back to the file. Ships with a ready-made light/dark palette and 16 templates you can extend with your own variables.",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./dist/index.js",
+    "./react": "./dist/react.js",
+    "./vite": "./dist/vite.js",
+    "./randomizer": "./dist/randomizer.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "palette-editor": "./bin/palette-editor.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "presets",
+    "examples",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "prepare": "node scripts/build.js",
+    "test": "node --test test/*.test.js"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "vite": ">=5"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  },
+  "keywords": [
+    "vite-plugin",
+    "react",
+    "palette",
+    "theme",
+    "css-variables",
+    "color-editor"
+  ]
+}

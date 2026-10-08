@@ -1,16 +1,174 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>She Tech | AI & automation, engineered</title>
-    <meta name="description" content="She Tech builds AI, automation and custom software that takes repetitive work off your team's plate." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..600&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>She Tech | AI & automation that gives your team time back</title>
+  <meta name="description" content="She Tech builds AI, automation and custom software that takes repetitive work off your team's plate.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="container nav" aria-label="Main">
+    <a href="index.html" class="logo">She<span>Tech</span></a>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+    <ul class="nav-links">
+      <li><a href="services.html">Services</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="how-we-work.html">How we work</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html" class="btn btn--primary">Book a call</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="eyebrow">AI · Automation · Custom software</span>
+      <h1>We build AI and automation that takes <em>repetitive work</em> off your team's plate.</h1>
+      <p class="lead">For founders, ops leaders and CTOs who'd rather their people spent time on judgement calls than on copy-paste. Less manual work, fewer errors, and money that stops slipping through the cracks.</p>
+      <div class="btn-row">
+        <a href="contact.html" class="btn btn--primary">Book a call</a>
+        <a href="work.html" class="btn btn--ghost">See our work</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Service pillars -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">What we do</span>
+        <h2>Three ways we take work off your plate</h2>
+      </div>
+      <div class="grid grid--3">
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <h3>AI solutions</h3>
+          <p>Stop reading documents by hand. We build AI that pulls the information you need out of contracts, emails and forms, with your team checking the result.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11M4 7l3-3M4 7l3 3M20 17H9M20 17l-3-3M20 17l-3 3"/></svg>
+          </div>
+          <h3>Automation</h3>
+          <p>No more re-typing data between tools. We connect your systems so invoices, updates and handoffs happen on their own, on time, every time.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg>
+          </div>
+          <h3>Custom software</h3>
+          <p>When off-the-shelf tools don't fit how you work, we build the internal tool or product that does, from prototype to production.</p>
+        </article>
+      </div>
+      <div class="btn-row"><a href="services.html" class="btn btn--ghost">Explore services</a></div>
+    </div>
+  </section>
+
+  <!-- Featured case studies -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Featured work</span>
+        <h2>Outcomes, not buzzwords</h2>
+        <p>Every project starts with a painful, slow or error-prone process, and ends with a measurable difference.</p>
+      </div>
+      <div class="grid grid--2">
+        <a href="work/nia.html" class="case-card">
+          <div class="case-card__media">
+            <div class="mock" aria-hidden="true">
+              <div class="mock__bar"><i></i><i></i><i></i></div>
+              <div class="mock__title">Contract_Acme_2026.pdf <span class="mock__badge">Extracted</span></div>
+              <div class="mock__row"><span>Client</span><span>Acme Logistics Ltd.</span></div>
+              <div class="mock__row"><span>Term</span><span>1 Jan 2026 – 31 Dec 2027</span></div>
+              <div class="mock__row"><span>Billing</span><span>Monthly · €4,200</span></div>
+            </div>
+          </div>
+          <div class="case-card__body">
+            <h3>Nia: contract-to-invoice in minutes, not hours</h3>
+            <p class="case-card__result">An AI platform that reads B2B contracts and sets up the whole invoicing schedule automatically.</p>
+            <ul class="tags"><li class="tag">AI</li><li class="tag">Document processing</li><li class="tag">Automation</li></ul>
+            <span class="case-card__more">Read the case study →</span>
+          </div>
+        </a>
+        <a href="contact.html" class="case-card case-card--cta">
+          <span class="eyebrow">Your process here</span>
+          <h3>Got a workflow your team dreads?</h3>
+          <p class="case-card__result">Tell us where the hours go. We'll tell you honestly whether AI or automation can help.</p>
+          <span class="case-card__more">Book a call →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TODO: Client logos / testimonials. Add once you have permission to show them.
+  <section class="section section--tight section--alt">
+    <div class="container">
+      <blockquote class="quote">
+        "Quote from a client about the outcome."
+        <cite>Name, Role, Company</cite>
+      </blockquote>
+    </div>
+  </section>
+  -->
+
+  <!-- Process teaser -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">How we work</span>
+        <h2>A clear path from problem to working software</h2>
+        <p>You see something real within weeks, and you stay in control at every step.</p>
+      </div>
+      <ol class="steps">
+        <li class="step"><h3>Discovery</h3><p>We map the process and find where the time and money go.</p></li>
+        <li class="step"><h3>Prototype</h3><p>A working proof on your real data, fast.</p></li>
+        <li class="step"><h3>Build</h3><p>Production-ready, connected to your tools.</p></li>
+        <li class="step"><h3>Support</h3><p>We monitor, improve and stay on call.</p></li>
+      </ol>
+      <div class="btn-row"><a href="how-we-work.html" class="btn btn--ghost">See the full process</a></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-band">
+        <div>
+          <h2>Let's find the hours hiding in your week.</h2>
+          <p>A 30-minute call with no obligation. You'll leave with at least one idea you can use.</p>
+        </div>
+        <a href="contact.html" class="btn btn--primary">Book a call</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a href="index.html" class="logo">She<span>Tech</span></a>
+      <p>AI, automation & custom software.<br>&copy; <span data-year></span> She Tech</p>
+    </div>
+    <ul class="footer-links">
+      <li><a href="services.html">Services</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="how-we-work.html">How we work</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
 </html>

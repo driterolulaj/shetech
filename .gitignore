@@ -1,1 +1,9 @@
+# Dependencies
 node_modules/
+
+# Local environment (contact email, form endpoint, booking link…)
+.env.local
+.env.*.local
+
+# Email credentials (never commit)
+.emailenv

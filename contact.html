@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact | She Tech</title>
+  <meta name="description" content="Book a call with She Tech or send us a message.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="container nav" aria-label="Main">
+    <a href="index.html" class="logo">She<span>Tech</span></a>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+    <ul class="nav-links">
+      <li><a href="services.html">Services</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="how-we-work.html">How we work</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html" class="btn btn--primary" aria-current="page">Book a call</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <span class="eyebrow">Contact</span>
+      <h1>Tell us where the hours go.</h1>
+      <p class="lead">Book a 30-minute call directly, or send a short message and we'll reply within one business day.</p>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="grid grid--2" style="align-items:start">
+        <div class="card">
+          <h2 style="font-size:1.5rem">Send a message</h2>
+          <!-- TODO: set action to your form endpoint (e.g. https://formspree.io/f/xxxx) and method="POST" -->
+          <form id="contact-form" class="form">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="email">Work email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" autocomplete="organization">
+            </div>
+            <div class="field">
+              <label for="interest">What are you interested in?</label>
+              <select id="interest" name="interest">
+                <option>Not sure yet</option>
+                <option>AI solutions</option>
+                <option>Automation</option>
+                <option>Custom software</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="message">What process is slowing your team down?</label>
+              <textarea id="message" name="message" required></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary">Send message</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2 style="font-size:1.5rem">Book a call</h2>
+          <p>Pick a time that suits you. In 30 minutes we'll understand your process, and you'll get an honest view of what's possible.</p>
+          <!-- TODO: replace href with your Calendly / Cal.com link, or embed their widget here -->
+          <a href="#" class="btn btn--primary">Choose a time</a>
+          <p class="form-note" style="margin-top:12px"><span class="ph">Calendar link goes here</span></p>
+          <hr style="border:0;border-top:1px solid var(--line);margin:28px 0">
+          <p style="margin-bottom:4px"><strong>Prefer email?</strong></p>
+          <p><a href="mailto:hello@shetech.example"><span class="ph">hello@shetech.example</span></a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a href="index.html" class="logo">She<span>Tech</span></a>
+      <p>AI, automation & custom software.<br>&copy; <span data-year></span> She Tech</p>
+    </div>
+    <ul class="footer-links">
+      <li><a href="services.html">Services</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="how-we-work.html">How we work</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
