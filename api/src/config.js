@@ -48,7 +48,7 @@ export const config = {
   },
 
   /**
-   * Colour editor on a deployed site (VITE_PALETTE_EDITOR=true): saves are committed here.
+   * Colour editor on the live site (/admin/home): saves are committed here.
    * GITHUB_TOKEN needs "Contents: read and write" on the repository. Repo and branch
    * default to the ones Vercel deployed from.
    */

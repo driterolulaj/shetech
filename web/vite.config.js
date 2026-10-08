@@ -191,12 +191,16 @@ function palettePlugin() {
   }
 }
 
-/** Serves /admin as admin.html in `npm run dev` and `npm run preview` (server/index.js does the same in production). */
+/**
+ * Serves /admin as admin.html and /admin/home (home page + colour editor) as admin-home.html
+ * in `npm run dev` and `npm run preview` (server/index.js and vercel.json do the same in production).
+ */
 function adminPagePlugin() {
   // Must return nothing: Vite treats a returned function as a post-middleware hook
   const mount = (server) => {
     server.middlewares.use((req, _res, next) => {
-      if (/^\/admin\/?(\?|$)/.test(req.url)) req.url = req.url.replace(/^\/admin\/?/, '/admin.html')
+      if (/^\/admin\/home\/?(\?|$)/.test(req.url)) req.url = req.url.replace(/^\/admin\/home\/?/, '/admin-home.html')
+      else if (/^\/admin\/?(\?|$)/.test(req.url)) req.url = req.url.replace(/^\/admin\/?/, '/admin.html')
       next()
     })
   }
@@ -212,7 +216,7 @@ export default defineConfig({
   preview: { proxy: apiProxy },
   build: {
     rolldownOptions: {
-      input: { main: path.join(root, 'index.html'), admin: path.join(root, 'admin.html') },
+      input: { main: path.join(root, 'index.html'), admin: path.join(root, 'admin.html'), adminHome: path.join(root, 'admin-home.html') },
     },
   },
 })

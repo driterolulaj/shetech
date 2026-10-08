@@ -6,14 +6,22 @@ import { Field, Input } from '../components/ui/Field'
 import { api } from './api'
 import { Dashboard } from './Dashboard'
 
-/** /admin: session check → sign-in screen or the bookings dashboard. */
+/** Where to go once signed in (?next=/admin/home), only for pages under /admin. */
+const NEXT = (() => {
+  const next = new URLSearchParams(window.location.search).get('next')
+  return next && /^\/admin\/[a-z0-9/-]*$/.test(next) ? next : null
+})()
+
+/** /admin: session check → sign-in screen or the bookings dashboard (or back to ?next). */
 export function AdminApp() {
   const [session, setSession] = useState(null) // null while loading
+
+  const signedIn = (next) => (NEXT && next.authenticated ? window.location.replace(NEXT) : setSession(next))
 
   useEffect(() => {
     api
       .session()
-      .then(setSession)
+      .then(signedIn)
       .catch(() => setSession({ authenticated: false, offline: true }))
   }, [])
 
@@ -28,7 +36,7 @@ export function AdminApp() {
   const signedOut = () => setSession({ authenticated: false })
 
   if (!session.authenticated) {
-    return <SignIn offline={session.offline} onSignedIn={setSession} />
+    return <SignIn offline={session.offline} onSignedIn={signedIn} />
   }
 
   return (

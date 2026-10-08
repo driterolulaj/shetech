@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 /**
  * Production web server: serves the built site from dist/ (the admin panel at
- * /admin) and forwards /api/* to the API service, so the browser only ever
+ * /admin, the home page with the colour editor at /admin/home) and forwards /api/* to the API service, so the browser only ever
  * talks to one origin. Equivalent to the nginx config in api/README.md.
  *
  *   npm run build && npm start
@@ -77,6 +77,10 @@ const server = http.createServer((req, res) => {
   if (pathname === '/admin' || pathname === '/admin/') {
     res.setHeader('X-Robots-Tag', 'noindex')
     return serveFile(res, path.join(DIST, 'admin.html'))
+  }
+  if (pathname === '/admin/home' || pathname === '/admin/home/') {
+    res.setHeader('X-Robots-Tag', 'noindex')
+    return serveFile(res, path.join(DIST, 'admin-home.html'))
   }
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.statusCode = 405

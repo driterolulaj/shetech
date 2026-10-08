@@ -9,12 +9,11 @@ import { Services } from './components/Services'
 import { Work } from './components/Work'
 import { useSmoothAnchors } from './hooks/useSmoothAnchors'
 
-// Colour scheme editor: in development, and in builds made with VITE_PALETTE_EDITOR=true (the
-// "studio" deployment, where only a signed-in admin sees it). Dropped from the normal production build.
-const PaletteEditor =
-  import.meta.env.DEV || import.meta.env.VITE_PALETTE_EDITOR === 'true' ? lazy(() => import('./components/dev/PaletteEditor')) : null
+// Colour scheme editor: loaded only in development and on /admin/home (signed-in admins), never on the public site
+const PaletteEditor = lazy(() => import('./components/dev/PaletteEditor'))
 
-export default function App() {
+/** The home page. `editor` adds the colour editor (/admin/home); it's always there in development. */
+export default function App({ editor = import.meta.env.DEV }) {
   useSmoothAnchors({ offset: 72 })
 
   return (
@@ -28,7 +27,7 @@ export default function App() {
         <About />
         <Footer />
       </main>
-      {PaletteEditor && (
+      {editor && (
         <Suspense fallback={null}>
           <PaletteEditor />
         </Suspense>

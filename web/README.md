@@ -91,7 +91,7 @@ All colours, for both light and dark themes, live in **`src/config/palette.json`
 
 Ways to change them:
 
-- **In the browser:** run `npm run dev` and click **Colours** (bottom-right). Pick colours for light and dark, watch the site update live, then **Save to file**. **Discard** drops unsaved changes; **Reset to defaults** (click twice) restores the originals. The editor only exists in development, so visitors never see it. (A separate *studio* deployment can have it too, for signed-in admins: see *A second deployment with the colour editor* in [`api/README.md`](../api/README.md).)
+- **In the browser:** run `npm run dev` and click **Colours** (bottom-right). Pick colours for light and dark, watch the site update live, then **Save to file**. **Discard** drops unsaved changes; **Reset to defaults** (click twice) restores the originals. The editor only exists in development, so visitors never see it. On the live site, signed-in admins get it at **`/admin/home`**, and saving there updates the site: see *Colour editor on the live site* in [`api/README.md`](../api/README.md).
 - **Templates:** in the same panel, click a template to preview it across the site, then **Save to file** to make it live. To keep the current colours as a template, type a name and **Save as template**; typing an existing name offers **Update** instead. The bin icon deletes a template (click twice). Each template holds both light and dark colours; the one that's live is marked *Live*.
 - **Switch template from the terminal:** `npm run palette:use -- purple` (lists the templates if the name is missing or wrong).
 - **By hand:** edit `palette.json` (hex colours, `#rrggbbaa` for transparency). With `npm run dev` running, the page reloads with your change.

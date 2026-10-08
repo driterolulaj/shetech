@@ -4,10 +4,13 @@
     "web": {
       "root": "web/",
       "framework": "vite",
-      "rewrites": [{ "source": "/admin", "destination": "/admin.html" }],
+      "rewrites": [
+        { "source": "/admin", "destination": "/admin.html" },
+        { "source": "/admin/home", "destination": "/admin-home.html" }
+      ],
       "headers": [
         { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
-        { "source": "/admin(.html)?", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] }
+        { "source": "/admin(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] }
       ]
     },
     "api": {

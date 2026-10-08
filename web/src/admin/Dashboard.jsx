@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ArrowUpRight, CalendarDays, LogOut, RefreshCw } from 'lucide-react'
+import { ArrowUpRight, CalendarDays, LogOut, Palette, RefreshCw } from 'lucide-react'
 import { Logo } from '../components/brand/Logo'
 import { ThemeToggle } from '../components/ui/ThemeToggle'
 import { cn } from '../lib/cn'
@@ -130,6 +130,13 @@ export function Dashboard({ email, onSignOut, onUnauthorized }) {
               <RefreshCw className={cn('size-4', refreshing && 'animate-spin')} strokeWidth={1.75} />
             </button>
             <ThemeToggle />
+            <a
+              href="/admin/home"
+              title="The home page with the colour editor"
+              className="hidden h-9 items-center gap-1.5 rounded-sm px-3 text-sm text-ink-2 transition-colors duration-300 ease-soft hover:text-accent sm:inline-flex"
+            >
+              <Palette className="size-4" strokeWidth={1.75} /> Colours
+            </a>
             <a
               href="/"
               target="_blank"

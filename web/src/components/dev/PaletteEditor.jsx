@@ -7,8 +7,8 @@ import { setThemePreference, useTheme } from '../../lib/theme'
 import { SITE } from '../../config/site'
 
 /**
- * Colour scheme editor (development, and the studio deployment built with
- * VITE_PALETTE_EDITOR=true; not part of the normal production build).
+ * Colour scheme editor (development, and /admin/home for signed-in admins;
+ * never loaded on the public site).
  *
  * Changes preview live. "Save" writes src/config/palette.json, which is what the
  * site is built from. "Reset" restores src/config/palette.defaults.json.
@@ -17,7 +17,7 @@ import { SITE } from '../../config/site'
  *
  * In development the files are written by the dev server (/__palette). On a deployed
  * site the API commits them to GitHub (/api/admin/palette, signed-in admins only),
- * and the site rebuilds with them; for anyone else the editor stays hidden.
+ * and the site rebuilds with them.
  */
 const DEPLOYED = !import.meta.env.DEV
 const API = DEPLOYED ? `${SITE.apiUrl}/api/admin/palette` : '/__palette'

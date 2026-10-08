@@ -75,6 +75,7 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
   }
   location = /admin { try_files /admin.html =404; }
+  location = /admin/home { try_files /admin-home.html =404; }
   location / { try_files $uri /index.html; }
 }
 ```
@@ -104,14 +105,12 @@ Check `https://<your-project>.vercel.app/api/health`, then sign in at `/admin`.
 
 Good to know: `TRUST_PROXY` defaults to `1` on Vercel (its edge sets the real client IP), and the rate limits count per function instance. To add more admins later, run `npm run admin:create` locally with `DATABASE_URL` in `api/.env` set to the Neon connection string (Storage → your database → `.env.local` tab).
 
-### A second deployment with the colour editor ("studio")
+### Colour editor on the live site (`/admin/home`)
 
-The colour editor (`web/README.md`, *Colours*) normally exists only in `npm run dev`. To use it on a deployed site, keep the normal site as it is and add a second Vercel project from the same repository and branch:
+`/admin/home` shows the home page exactly as visitors see it, plus the **Colours** editor (see *Colours* in `web/README.md`). Only signed-in admins get it: anyone else is sent to the sign-in at `/admin` and brought back afterwards. The dashboard links to it (**Colours**). The public home page never loads the editor.
 
-1. **Add New → Project**, import the same repository again and name it e.g. `shetech-studio`. Give it the same environment variables as the normal project, plus:
-   - `VITE_PALETTE_EDITOR=true`: builds the website with the editor in it
-   - `GITHUB_TOKEN`: a [fine-grained token](https://github.com/settings/personal-access-tokens/new) for this repository only, with *Contents: Read and write*
-2. Storage → your Neon database → connect it to this project too, so the same admin login works.
-3. Deploy, sign in at `https://shetech-studio.vercel.app/admin`, then open the home page: the **Colours** button is there. Visitors who aren't signed in see the normal site.
+Saving there commits the palette files (`web/src/config/`) to GitHub, and the push makes Vercel rebuild the site with them (about a minute). For that, set on the Vercel project:
 
-Saving in the editor commits the palette files (`web/src/config/`) to GitHub, and both projects rebuild with them, so the normal site changes about a minute later. Commits carry the admin's email in the message; run `git pull` before your next local change. The editor requests go to `/api/admin/palette` (`src/routes/palette.js`).
+- `GITHUB_TOKEN`: a [fine-grained token](https://github.com/settings/personal-access-tokens/new) for this repository only, with *Contents: Read and write*. The repository and branch default to the ones Vercel deploys from (`GITHUB_REPO` / `GITHUB_BRANCH` override them).
+
+Without it, `/admin/home` shows "Colours unavailable" with the reason instead of the editor. Commit messages carry the admin's email; run `git pull` before your next local change. The editor's requests go to `/api/admin/palette` (`src/routes/palette.js`).
