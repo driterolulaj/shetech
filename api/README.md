@@ -1,6 +1,6 @@
 # She Tech API
 
-The backend for the She Tech website: contact and booking forms, Gmail notifications and the bookings admin panel. Node 22.9+ (Express 5), MySQL 8 or MariaDB 10.4+.
+The backend for the She Tech website: contact and booking forms, Gmail notifications and the bookings admin panel. Node 22.9+ (Express 5), PostgreSQL 14+ (Neon on Vercel).
 
 ```bash
 cp .env.example .env    # fill in DB, Gmail and admin settings
@@ -33,13 +33,14 @@ Migrations live in `migrations/` and run once each, in name order (tracked in `s
 
 All times are stored in UTC.
 
-**Local MySQL (XAMPP):** create a database and a dedicated user rather than using `root`:
+**Local PostgreSQL:** install it (e.g. from postgresql.org), create a user and database, and set `DATABASE_URL` in `.env`:
 
 ```sql
-CREATE DATABASE shetech CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'shetech'@'localhost' IDENTIFIED BY 'a-long-random-password';
-GRANT ALL PRIVILEGES ON shetech.* TO 'shetech'@'localhost';
+CREATE USER shetech WITH PASSWORD 'a-long-random-password';
+CREATE DATABASE shetech OWNER shetech;
 ```
+
+Or skip the local install: create a free second database (a Neon branch) and point your local `DATABASE_URL` at that.
 
 ## Endpoints
 
@@ -82,28 +83,23 @@ On the API VM set `TRUST_PROXY=1`, `PUBLIC_URL=https://shetech.com`, and firewal
 
 **2. API on its own subdomain** (e.g. `api.shetech.com`). Build the website with `VITE_API_URL=https://api.shetech.com`, and set `CORS_ORIGINS=https://shetech.com` on the API. Keep both on the same site (`*.shetech.com`) so the admin cookie keeps `SameSite=Strict`.
 
-The database can live on a third machine: point `DB_HOST` at it and allow the API VM through its firewall.
+The database can live on a third machine: point `DATABASE_URL` at it and allow the API VM through its firewall.
 
 ## Deploying to Vercel (website and API in one project)
 
 `vercel.json` at the repository root uses [Vercel Services](https://vercel.com/docs/services) (beta): the website (`web/`, Vite) and this API (`api/`, Express as one function) deploy together on one domain. `/api/*` goes to the API with the path unchanged, everything else to the website, so it is same-origin like the nginx setup: no CORS, and the admin cookie stays `SameSite=Strict`. `server.js` isn't used there; Vercel serves the app exported by `src/app.js`.
 
-Vercel has no MySQL of its own, so the database lives elsewhere. Free options:
+The database is **[Neon](https://neon.com) Postgres**, added from Vercel's Storage tab (free plan). Vercel then sets `DATABASE_URL` (and `DATABASE_URL_UNPOOLED`, used for migrations) on the project by itself.
 
-- **[TiDB Cloud Starter](https://tidbcloud.com)** (MySQL-compatible, free quota). Create a cluster, then *Connect* gives host, port `4000`, a user like `xxxx.root` and a password. Set `DB_SSL=true`.
-- **[Aiven for MySQL](https://aiven.io/mysql)** free plan (real MySQL 8). Set `DB_SSL_CA` to the CA certificate from the service page.
-
-Put the database in the same region as your Vercel functions (Project → Settings → Functions → Region, e.g. Frankfurt `fra1`), as every request makes several queries.
-
-1. Push the repository to GitHub, then on Vercel: **Add New → Project**, import it, and leave the root directory as the repository root (the framework preset shows *Services*).
-2. Before the first deploy, add the environment variables (Settings → Environment Variables):
-   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL` / `DB_SSL_CA`, and `DB_POOL_SIZE=3` (free databases allow few connections)
+1. Push the repository to GitHub, then on Vercel: **Add New → Project**, import it, and leave the root directory as the repository root (the framework preset shows *Services*). Add these environment variables before deploying:
    - `GMAIL_USER`, `GMAIL_APP_PASSWORD`, optionally `MAIL_TO`
    - `ADMIN_EMAIL`, `ADMIN_PASSWORD` (first admin)
    - `PUBLIC_URL=https://<your-project>.vercel.app` (or your domain), for the admin link in emails
    - the website's `VITE_*` settings (see `web/.env.example`; leave `VITE_API_URL` empty)
-3. Deploy. The API's build step runs `npm run setup`, so migrations are applied and the first admin is created; if the database can't be reached the deploy fails rather than going live broken. Preview deployments do the same against whichever database their environment variables point to.
+2. Deploy. This first build fails with "can't reach the database": expected, there isn't one yet.
+3. In the project: **Storage → Create Database → Neon**, free plan, region next to your functions (Frankfurt if the functions run in `fra1`: Settings → Functions → Region), and connect it to all environments.
+4. **Deployments → Redeploy.** The API's build step runs `npm run setup`, which creates the tables and the first admin. From now on every deploy applies new migrations, and a deploy fails rather than going live if the database can't be reached. (Preview deployments migrate whichever database their environment points to; Neon can give previews their own branch.)
 
-Check `https://<your-project>.vercel.app/api/health` afterwards, then sign in at `/admin`.
+Check `https://<your-project>.vercel.app/api/health`, then sign in at `/admin`.
 
-Good to know: `TRUST_PROXY` defaults to `1` on Vercel (its edge sets the real client IP), and the rate limits count per function instance. To add more admins later, run `npm run admin:create` locally with `api/.env` pointing at the hosted database.
+Good to know: `TRUST_PROXY` defaults to `1` on Vercel (its edge sets the real client IP), and the rate limits count per function instance. To add more admins later, run `npm run admin:create` locally with `DATABASE_URL` in `api/.env` set to the Neon connection string (Storage → your database → `.env.local` tab).

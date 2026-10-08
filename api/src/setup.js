@@ -30,7 +30,7 @@ export async function setup() {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   setup()
     .catch((err) => {
-      console.error('[setup] failed:', err.code === 'ECONNREFUSED' ? `can't reach MySQL at ${config.db.host}:${config.db.port}` : err.message)
+      console.error('[setup] failed:', err.code === 'ECONNREFUSED' ? "can't reach the database: check DATABASE_URL" : err.message)
       process.exitCode = 1
     })
     .finally(() => pool.end())

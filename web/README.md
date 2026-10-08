@@ -1,6 +1,6 @@
 # She Tech website
 
-React + Tailwind v4 + Vite. The frontend only: forms, bookings and the admin panel talk to the **API service in [`../api`](../api/README.md)** (Node + MySQL), which must be running for them to work.
+React + Tailwind v4 + Vite. The frontend only: forms, bookings and the admin panel talk to the **API service in [`../api`](../api/README.md)** (Node + PostgreSQL), which must be running for them to work.
 
 ```bash
 npm install
@@ -12,7 +12,7 @@ npm start        # serves dist/ on :3000 and forwards /api to API_URL (default h
 Local development, two terminals:
 
 ```bash
-cd api && npm run dev    # API on :4000 (needs MySQL, see api/README.md)
+cd api && npm run dev    # API on :4000 (needs PostgreSQL, see api/README.md)
 cd web && npm run dev    # website on :5173
 ```
 
@@ -45,7 +45,7 @@ Open `/admin` (e.g. http://localhost:5173/admin) and sign in with your admin ema
 - **Confirm** a time (with an optional meeting link). The client gets an email with a calendar invite, shown in their own time zone. Reschedule the same way.
 - **Cancel / decline** (optionally emailing the client), **mark completed**, keep **internal notes**, see the **history**, or delete.
 
-Bookings, clients and enquiries are stored in MySQL by the API. See [`api/README.md`](../api/README.md) for the schema, and back that database up.
+Bookings, clients and enquiries are stored in PostgreSQL by the API. See [`api/README.md`](../api/README.md) for the schema, and back that database up.
 
 **Links that open the contact dialog from anywhere**, including content files:
 

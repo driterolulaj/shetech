@@ -1,90 +1,77 @@
--- Initial schema. All DATETIME values are UTC.
+-- Initial schema (PostgreSQL). Times are timestamptz: absolute instants, shown in UTC.
 
 CREATE TABLE clients (
-  id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  email       VARCHAR(254) NOT NULL,
-  name        VARCHAR(200) NOT NULL,
-  company     VARCHAR(200) NULL,
-  timezone    VARCHAR(80)  NULL,
-  created_at  DATETIME(3)  NOT NULL,
-  updated_at  DATETIME(3)  NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_clients_email (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  id          integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  email       varchar(254) NOT NULL UNIQUE,
+  name        varchar(200) NOT NULL,
+  company     varchar(200),
+  timezone    varchar(80),
+  created_at  timestamptz  NOT NULL,
+  updated_at  timestamptz  NOT NULL
+);
 
 -- Call requests from "Book a call", handled in the admin panel
 CREATE TABLE bookings (
-  id              CHAR(36)     NOT NULL,
-  client_id       INT UNSIGNED NOT NULL,
-  status          ENUM('new', 'confirmed', 'completed', 'cancelled') NOT NULL DEFAULT 'new',
-  interest        VARCHAR(200) NULL,
-  project         VARCHAR(200) NULL,
-  preferred_days  VARCHAR(300) NULL COMMENT 'As the visitor saw them, e.g. "Thu 9 Oct, Fri 10 Oct"',
-  preferred_time  VARCHAR(60)  NULL,
-  note            TEXT         NULL COMMENT 'What the visitor wrote',
-  scheduled_at    DATETIME(3)  NULL,
-  duration_min    SMALLINT UNSIGNED NOT NULL DEFAULT 30,
-  meeting_link    VARCHAR(500) NULL,
-  notes           TEXT         NULL COMMENT 'Internal notes, admin only',
-  sequence        INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Calendar invite revision',
-  created_at      DATETIME(3)  NOT NULL,
-  updated_at      DATETIME(3)  NOT NULL,
-  PRIMARY KEY (id),
-  KEY ix_bookings_status (status),
-  KEY ix_bookings_scheduled_at (scheduled_at),
-  KEY ix_bookings_client (client_id),
-  CONSTRAINT fk_bookings_client FOREIGN KEY (client_id) REFERENCES clients (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  id              varchar(36)  PRIMARY KEY,
+  client_id       integer      NOT NULL REFERENCES clients (id),
+  status          varchar(16)  NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'confirmed', 'completed', 'cancelled')),
+  interest        varchar(200),
+  project         varchar(200),
+  preferred_days  varchar(300),   -- as the visitor saw them, e.g. "Thu 9 Oct, Fri 10 Oct"
+  preferred_time  varchar(60),
+  note            text,           -- what the visitor wrote
+  scheduled_at    timestamptz,
+  duration_min    smallint     NOT NULL DEFAULT 30,
+  meeting_link    varchar(500),
+  notes           text,           -- internal notes, admin only
+  sequence        integer      NOT NULL DEFAULT 0,  -- calendar invite revision
+  created_at      timestamptz  NOT NULL,
+  updated_at      timestamptz  NOT NULL
+);
+CREATE INDEX ix_bookings_status ON bookings (status);
+CREATE INDEX ix_bookings_scheduled_at ON bookings (scheduled_at);
+CREATE INDEX ix_bookings_client ON bookings (client_id);
 
 -- Days the visitor said would suit them (shown on the admin calendar)
 CREATE TABLE booking_preferred_dates (
-  booking_id  CHAR(36) NOT NULL,
-  date        DATE     NOT NULL,
-  PRIMARY KEY (booking_id, date),
-  CONSTRAINT fk_preferred_booking FOREIGN KEY (booking_id) REFERENCES bookings (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  booking_id  varchar(36) NOT NULL REFERENCES bookings (id) ON DELETE CASCADE,
+  date        date        NOT NULL,
+  PRIMARY KEY (booking_id, date)
+);
 
 -- Booking history ("Confirmed for …", "Confirmation emailed to …")
 CREATE TABLE booking_events (
-  id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  booking_id  CHAR(36)     NOT NULL,
-  text        VARCHAR(500) NOT NULL,
-  created_at  DATETIME(3)  NOT NULL,
-  PRIMARY KEY (id),
-  KEY ix_events_booking (booking_id, created_at),
-  CONSTRAINT fk_events_booking FOREIGN KEY (booking_id) REFERENCES bookings (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  booking_id  varchar(36)  NOT NULL REFERENCES bookings (id) ON DELETE CASCADE,
+  text        varchar(500) NOT NULL,
+  created_at  timestamptz  NOT NULL
+);
+CREATE INDEX ix_events_booking ON booking_events (booking_id, created_at);
 
 -- "Send a message" submissions
 CREATE TABLE enquiries (
-  id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  client_id   INT UNSIGNED NOT NULL,
-  interest    VARCHAR(200) NULL,
-  project     VARCHAR(200) NULL,
-  message     TEXT         NOT NULL,
-  created_at  DATETIME(3)  NOT NULL,
-  PRIMARY KEY (id),
-  KEY ix_enquiries_client (client_id),
-  CONSTRAINT fk_enquiries_client FOREIGN KEY (client_id) REFERENCES clients (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  id          integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  client_id   integer      NOT NULL REFERENCES clients (id),
+  interest    varchar(200),
+  project     varchar(200),
+  message     text         NOT NULL,
+  created_at  timestamptz  NOT NULL
+);
+CREATE INDEX ix_enquiries_client ON enquiries (client_id);
 
 CREATE TABLE admin_users (
-  id             INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  email          VARCHAR(254) NOT NULL,
-  password_hash  VARCHAR(255) NOT NULL,
-  created_at     DATETIME(3)  NOT NULL,
-  last_login_at  DATETIME(3)  NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_admin_users_email (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  id             integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  email          varchar(254) NOT NULL UNIQUE,
+  password_hash  varchar(255) NOT NULL,
+  created_at     timestamptz  NOT NULL,
+  last_login_at  timestamptz
+);
 
 -- Only a SHA-256 of each session token is stored, never the token itself
 CREATE TABLE admin_sessions (
-  token_hash  CHAR(64)     NOT NULL,
-  user_id     INT UNSIGNED NOT NULL,
-  created_at  DATETIME(3)  NOT NULL,
-  expires_at  DATETIME(3)  NOT NULL,
-  PRIMARY KEY (token_hash),
-  KEY ix_sessions_expires (expires_at),
-  CONSTRAINT fk_sessions_user FOREIGN KEY (user_id) REFERENCES admin_users (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  token_hash  char(64)     PRIMARY KEY,
+  user_id     integer      NOT NULL REFERENCES admin_users (id) ON DELETE CASCADE,
+  created_at  timestamptz  NOT NULL,
+  expires_at  timestamptz  NOT NULL
+);
+CREATE INDEX ix_sessions_expires ON admin_sessions (expires_at);

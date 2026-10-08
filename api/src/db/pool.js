@@ -1,38 +1,37 @@
 import { attachDatabasePool } from '@vercel/functions'
-import mysql from 'mysql2/promise'
+import pg from 'pg'
 import { config } from '../config.js'
 
+const DATE = 1082
+
 /**
- * Shared MySQL/MariaDB pool. All times are stored in UTC: the session time zone
- * is pinned to +00:00 and mysql2 converts JS Dates as UTC (`timezone: 'Z'`).
- * DATE columns come back as 'YYYY-MM-DD' strings, not Dates.
+ * Shared PostgreSQL pool. Times are timestamptz and come back as JS Dates;
+ * DATE columns come back as 'YYYY-MM-DD' strings, not Dates (which would shift
+ * with the server's time zone).
  */
-export const pool = mysql.createPool({
+export const pool = new pg.Pool({
   ...config.db,
-  timezone: 'Z',
-  dateStrings: ['DATE'],
-  charset: 'utf8mb4_unicode_ci',
-  waitForConnections: true,
+  types: { getTypeParser: (oid, format) => (oid === DATE ? (value) => value : pg.types.getTypeParser(oid, format)) },
 })
 
-pool.pool.on('connection', (connection) => connection.query("SET time_zone = '+00:00'"))
+// The database may close idle connections (Neon does when it scales to zero); without a listener that would crash the process
+pool.on('error', (err) => console.error('[db] idle connection error:', err.message))
 
 // On Vercel, close idle connections before a function instance is suspended so they don't pile up on the database
-// (it recognises mysql2's underlying callback pool, not the promise wrapper)
-if (process.env.VERCEL) attachDatabasePool(pool.pool)
+if (process.env.VERCEL) attachDatabasePool(pool)
 
-/** Runs `work(connection)` in a transaction; commits on success, rolls back on error. */
+/** Runs `work(client)` in a transaction; commits on success, rolls back on error. */
 export async function transaction(work) {
-  const connection = await pool.getConnection()
+  const client = await pool.connect()
   try {
-    await connection.beginTransaction()
-    const result = await work(connection)
-    await connection.commit()
+    await client.query('BEGIN')
+    const result = await work(client)
+    await client.query('COMMIT')
     return result
   } catch (err) {
-    await connection.rollback()
+    await client.query('ROLLBACK')
     throw err
   } finally {
-    connection.release()
+    client.release()
   }
 }

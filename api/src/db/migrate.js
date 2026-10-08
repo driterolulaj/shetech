@@ -1,46 +1,45 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import mysql from 'mysql2/promise'
+import pg from 'pg'
 import { config } from '../config.js'
 
 /**
  * Applies api/migrations/*.sql in name order, once each, recording them in
- * `schema_migrations`. Creates the database first if the user is allowed to.
+ * `schema_migrations`. Everything runs in one transaction (Postgres DDL is
+ * transactional), so a failed migration leaves the database as it was, and an
+ * advisory lock keeps two deploys from migrating at the same time.
  * Runs on server start-up, or by hand with `npm run migrate`.
  */
 const MIGRATIONS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../migrations')
+const LOCK_ID = 7_413_001 // any constant; identifies "She Tech migrations" for pg_advisory_xact_lock
 
 export async function migrate({ log = console.log } = {}) {
-  const { database, ...server } = config.db
-  const { connectionLimit, ...options } = server
-  const connection = await mysql.createConnection({ ...options, timezone: 'Z', multipleStatements: true })
+  // Direct (unpooled) connection where the provider has one, as poolers can get in the way of DDL
+  const client = new pg.Client({ ...config.db, connectionString: config.db.directConnectionString })
+  await client.connect()
   try {
-    try {
-      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`)
-    } catch (err) {
-      if (err.code !== 'ER_DBACCESS_DENIED_ERROR' && err.code !== 'ER_ACCESS_DENIED_ERROR') throw err // fine if it already exists
-    }
-    await connection.query(`USE \`${database}\``)
-    await connection.query("SET time_zone = '+00:00'")
-    await connection.query(
-      'CREATE TABLE IF NOT EXISTS schema_migrations (name VARCHAR(255) PRIMARY KEY, applied_at DATETIME(3) NOT NULL) ENGINE=InnoDB',
-    )
+    await client.query('BEGIN')
+    await client.query('SELECT pg_advisory_xact_lock($1)', [LOCK_ID])
+    await client.query('CREATE TABLE IF NOT EXISTS schema_migrations (name varchar(255) PRIMARY KEY, applied_at timestamptz NOT NULL)')
 
-    const [rows] = await connection.query('SELECT name FROM schema_migrations')
+    const { rows } = await client.query('SELECT name FROM schema_migrations')
     const applied = new Set(rows.map((r) => r.name))
     const files = (await fs.readdir(MIGRATIONS)).filter((f) => f.endsWith('.sql')).sort()
 
     const pending = files.filter((f) => !applied.has(f))
     for (const file of pending) {
       log(`[db] applying ${file}`)
-      // MySQL DDL commits implicitly, so a failed migration must be fixed by hand; keep each one small
-      await connection.query(await fs.readFile(path.join(MIGRATIONS, file), 'utf8'))
-      await connection.query('INSERT INTO schema_migrations (name, applied_at) VALUES (?, ?)', [file, new Date()])
+      await client.query(await fs.readFile(path.join(MIGRATIONS, file), 'utf8'))
+      await client.query('INSERT INTO schema_migrations (name, applied_at) VALUES ($1, $2)', [file, new Date()])
     }
+    await client.query('COMMIT')
     return pending.length
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {})
+    throw err
   } finally {
-    await connection.end()
+    await client.end()
   }
 }
 

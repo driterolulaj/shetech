@@ -1,20 +1,20 @@
 /**
  * Clients are keyed by email: a returning visitor updates their record
  * (latest name, company and time zone win; blanks never overwrite).
- * Returns the client id. Pass a transaction connection.
+ * Returns the client id. Pass a transaction client.
  */
-export async function upsertClient(connection, { email, name, company, timezone }) {
+export async function upsertClient(client, { email, name, company, timezone }) {
   const now = new Date()
-  const [result] = await connection.query(
+  const { rows } = await client.query(
     `INSERT INTO clients (email, name, company, timezone, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?)
-     ON DUPLICATE KEY UPDATE
-       id = LAST_INSERT_ID(id),
-       name = VALUES(name),
-       company = COALESCE(VALUES(company), company),
-       timezone = COALESCE(VALUES(timezone), timezone),
-       updated_at = VALUES(updated_at)`,
-    [email.toLowerCase(), name, company || null, timezone || null, now, now],
+     VALUES ($1, $2, $3, $4, $5, $5)
+     ON CONFLICT (email) DO UPDATE SET
+       name = EXCLUDED.name,
+       company = COALESCE(EXCLUDED.company, clients.company),
+       timezone = COALESCE(EXCLUDED.timezone, clients.timezone),
+       updated_at = EXCLUDED.updated_at
+     RETURNING id`,
+    [email.toLowerCase(), name, company || null, timezone || null, now],
   )
-  return result.insertId
+  return rows[0].id
 }

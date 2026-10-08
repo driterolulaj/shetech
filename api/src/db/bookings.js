@@ -45,9 +45,9 @@ function toBooking(row, dates = [], events = []) {
 async function hydrate(rows) {
   if (rows.length === 0) return []
   const ids = rows.map((r) => r.id)
-  const [[dates], [events]] = await Promise.all([
-    pool.query('SELECT booking_id, date FROM booking_preferred_dates WHERE booking_id IN (?) ORDER BY date', [ids]),
-    pool.query('SELECT booking_id, text, created_at FROM booking_events WHERE booking_id IN (?) ORDER BY created_at, id', [ids]),
+  const [{ rows: dates }, { rows: events }] = await Promise.all([
+    pool.query('SELECT booking_id, date FROM booking_preferred_dates WHERE booking_id = ANY($1) ORDER BY date', [ids]),
+    pool.query('SELECT booking_id, text, created_at FROM booking_events WHERE booking_id = ANY($1) ORDER BY created_at, id', [ids]),
   ])
   const group = (items, map) => {
     const result = new Map()
@@ -60,12 +60,12 @@ async function hydrate(rows) {
 }
 
 export async function listBookings() {
-  const [rows] = await pool.query(`${SELECT} ORDER BY b.created_at DESC`)
+  const { rows } = await pool.query(`${SELECT} ORDER BY b.created_at DESC`)
   return hydrate(rows)
 }
 
 export async function getBooking(id) {
-  const [rows] = await pool.query(`${SELECT} WHERE b.id = ?`, [id])
+  const { rows } = await pool.query(`${SELECT} WHERE b.id = $1`, [id])
   return (await hydrate(rows))[0] ?? null
 }
 
@@ -73,17 +73,20 @@ export async function getBooking(id) {
 export async function createBooking({ client, interest, project, preferredDates, preferredDays, preferredTime, note }) {
   const id = crypto.randomUUID()
   const now = new Date()
-  await transaction(async (connection) => {
-    const clientId = await upsertClient(connection, client)
-    await connection.query(
+  await transaction(async (db) => {
+    const clientId = await upsertClient(db, client)
+    await db.query(
       `INSERT INTO bookings (id, client_id, status, interest, project, preferred_days, preferred_time, note, created_at, updated_at)
-       VALUES (?, ?, 'new', ?, ?, ?, ?, ?, ?, ?)`,
-      [id, clientId, interest || null, project || null, preferredDays || null, preferredTime || null, note || null, now, now],
+       VALUES ($1, $2, 'new', $3, $4, $5, $6, $7, $8, $8)`,
+      [id, clientId, interest || null, project || null, preferredDays || null, preferredTime || null, note || null, now],
     )
     if (preferredDates.length) {
-      await connection.query('INSERT IGNORE INTO booking_preferred_dates (booking_id, date) VALUES ?', [preferredDates.map((d) => [id, d])])
+      await db.query('INSERT INTO booking_preferred_dates (booking_id, date) SELECT $1, unnest($2::date[]) ON CONFLICT DO NOTHING', [
+        id,
+        preferredDates,
+      ])
     }
-    await connection.query('INSERT INTO booking_events (booking_id, text, created_at) VALUES (?, ?, ?)', [id, 'Requested on the website', now])
+    await db.query('INSERT INTO booking_events (booking_id, text, created_at) VALUES ($1, $2, $3)', [id, 'Requested on the website', now])
   })
   return getBooking(id)
 }
@@ -105,14 +108,16 @@ const COLUMNS = {
 export async function updateBooking(id, changes = {}, events = []) {
   const now = new Date()
   const fields = Object.entries(changes).filter(([key]) => COLUMNS[key])
-  const found = await transaction(async (connection) => {
-    const [result] = await connection.query(
-      `UPDATE bookings SET ${[...fields.map(([key]) => `${COLUMNS[key]} = ?`), 'updated_at = ?'].join(', ')} WHERE id = ?`,
-      [...fields.map(([key, value]) => (key === 'scheduledAt' && value ? new Date(value) : value)), now, id],
-    )
-    if (result.affectedRows === 0) return false
+  const found = await transaction(async (db) => {
+    const sets = [...fields.map(([key], i) => `${COLUMNS[key]} = $${i + 1}`), `updated_at = $${fields.length + 1}`]
+    const result = await db.query(`UPDATE bookings SET ${sets.join(', ')} WHERE id = $${fields.length + 2}`, [
+      ...fields.map(([key, value]) => (key === 'scheduledAt' && value ? new Date(value) : value)),
+      now,
+      id,
+    ])
+    if (result.rowCount === 0) return false
     for (const text of events) {
-      await connection.query('INSERT INTO booking_events (booking_id, text, created_at) VALUES (?, ?, ?)', [id, text, new Date()])
+      await db.query('INSERT INTO booking_events (booking_id, text, created_at) VALUES ($1, $2, $3)', [id, text, new Date()])
     }
     return true
   })
@@ -121,10 +126,10 @@ export async function updateBooking(id, changes = {}, events = []) {
 
 /** Appends one history line without touching anything else. */
 export async function addBookingEvent(id, text) {
-  await pool.query('INSERT INTO booking_events (booking_id, text, created_at) VALUES (?, ?, ?)', [id, text, new Date()])
+  await pool.query('INSERT INTO booking_events (booking_id, text, created_at) VALUES ($1, $2, $3)', [id, text, new Date()])
 }
 
 export async function deleteBooking(id) {
-  const [result] = await pool.query('DELETE FROM bookings WHERE id = ?', [id])
-  return result.affectedRows > 0
+  const result = await pool.query('DELETE FROM bookings WHERE id = $1', [id])
+  return result.rowCount > 0
 }

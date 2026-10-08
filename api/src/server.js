@@ -20,6 +20,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('[api] failed to start:', err.code === 'ECONNREFUSED' ? `can't reach MySQL at ${config.db.host}:${config.db.port}` : err.message)
+  console.error('[api] failed to start:', err.code === 'ECONNREFUSED' ? "can't reach the database: check DATABASE_URL" : err.message)
   process.exit(1)
 })

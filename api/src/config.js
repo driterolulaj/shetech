@@ -27,22 +27,15 @@ export const config = {
    */
   trustProxy: env.TRUST_PROXY ? (/^\d+$/.test(env.TRUST_PROXY) ? Number(env.TRUST_PROXY) : env.TRUST_PROXY) : env.VERCEL ? 1 : false,
 
+  /**
+   * PostgreSQL. Neon (added from Vercel's Storage tab) sets DATABASE_URL and
+   * DATABASE_URL_UNPOOLED itself, with TLS in the URL (?sslmode=require).
+   */
   db: {
-    host: env.DB_HOST || '127.0.0.1',
-    port: Number(env.DB_PORT) || 3306,
-    user: env.DB_USER || 'root',
-    password: env.DB_PASSWORD || '',
-    database: env.DB_NAME || 'shetech',
-    connectionLimit: Number(env.DB_POOL_SIZE) || 10,
-    /**
-     * TLS, required by hosted databases (TiDB Cloud, Aiven…). DB_SSL=true verifies against the
-     * system CAs; DB_SSL_CA holds the provider's CA certificate (PEM) when it uses its own.
-     */
-    ssl:
-      env.DB_SSL === 'true' || env.DB_SSL_CA
-        ? // A PEM pasted into one line has literal \n sequences
-          { minVersion: 'TLSv1.2', rejectUnauthorized: true, ...(env.DB_SSL_CA && { ca: env.DB_SSL_CA.replace(/\\n/g, '\n') }) }
-        : undefined,
+    connectionString: env.DATABASE_URL || env.POSTGRES_URL || 'postgres://localhost:5432/shetech',
+    /** Direct connection for migrations, where the provider separates it from the pooled one. */
+    directConnectionString: env.DATABASE_URL_UNPOOLED || env.POSTGRES_URL_NON_POOLING || env.DATABASE_URL || env.POSTGRES_URL || 'postgres://localhost:5432/shetech',
+    max: Number(env.DB_POOL_SIZE) || 10,
   },
 
   mail: {

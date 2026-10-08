@@ -16,7 +16,7 @@
   "dependencies": {
     "@vercel/functions": "^3.9.11",
     "express": "^5.2.1",
-    "mysql2": "^3.24.5",
-    "nodemailer": "^7.0.13"
+    "nodemailer": "^7.0.13",
+    "pg": "^8.23.1"
   }
 }
