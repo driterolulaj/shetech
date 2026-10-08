@@ -103,3 +103,15 @@ The database is **[Neon](https://neon.com) Postgres**, added from Vercel's Stora
 Check `https://<your-project>.vercel.app/api/health`, then sign in at `/admin`.
 
 Good to know: `TRUST_PROXY` defaults to `1` on Vercel (its edge sets the real client IP), and the rate limits count per function instance. To add more admins later, run `npm run admin:create` locally with `DATABASE_URL` in `api/.env` set to the Neon connection string (Storage → your database → `.env.local` tab).
+
+### A second deployment with the colour editor ("studio")
+
+The colour editor (`web/README.md`, *Colours*) normally exists only in `npm run dev`. To use it on a deployed site, keep the normal site as it is and add a second Vercel project from the same repository and branch:
+
+1. **Add New → Project**, import the same repository again and name it e.g. `shetech-studio`. Give it the same environment variables as the normal project, plus:
+   - `VITE_PALETTE_EDITOR=true`: builds the website with the editor in it
+   - `GITHUB_TOKEN`: a [fine-grained token](https://github.com/settings/personal-access-tokens/new) for this repository only, with *Contents: Read and write*
+2. Storage → your Neon database → connect it to this project too, so the same admin login works.
+3. Deploy, sign in at `https://shetech-studio.vercel.app/admin`, then open the home page: the **Colours** button is there. Visitors who aren't signed in see the normal site.
+
+Saving in the editor commits the palette files (`web/src/config/`) to GitHub, and both projects rebuild with them, so the normal site changes about a minute later. Commits carry the admin's email in the message; run `git pull` before your next local change. The editor requests go to `/api/admin/palette` (`src/routes/palette.js`).

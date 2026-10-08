@@ -5,6 +5,7 @@ import { addBookingEvent, deleteBooking, getBooking, listBookings, updateBooking
 import { bookingIcs, formatInZone, sendMail } from '../lib/mail.js'
 import { DUMMY_HASH, randomToken, sha256, verifyPassword } from '../lib/passwords.js'
 import { rateLimiter } from '../lib/rateLimit.js'
+import { paletteRouter } from './palette.js'
 
 /**
  * Admin API (/api/admin), used by the booking panel at /admin.
@@ -19,6 +20,7 @@ import { rateLimiter } from '../lib/rateLimit.js'
  *            cancel    { notify }
  *            notes     { notes }
  *   DELETE /bookings/:id
+ *   …      /palette                       colour editor on a deployed site (routes/palette.js)
  *
  * Sessions live in admin_sessions; the cookie holds a random token (HttpOnly,
  * SameSite). Every request except GET /session must send `X-Admin: 1`, which a
@@ -96,6 +98,8 @@ adminRouter.use(async (req, res, next) => {
   req.admin = await currentAdmin(req)
   return req.admin ? next() : res.status(401).json({ error: 'Please sign in.' })
 })
+
+adminRouter.use('/palette', paletteRouter)
 
 adminRouter.get('/bookings', async (_req, res) => {
   res.json({ bookings: await listBookings() })

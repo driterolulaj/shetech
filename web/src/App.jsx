@@ -9,8 +9,10 @@ import { Services } from './components/Services'
 import { Work } from './components/Work'
 import { useSmoothAnchors } from './hooks/useSmoothAnchors'
 
-// Colour scheme editor: development only, so it's dropped from the production build
-const PaletteEditor = import.meta.env.DEV ? lazy(() => import('./components/dev/PaletteEditor')) : null
+// Colour scheme editor: in development, and in builds made with VITE_PALETTE_EDITOR=true (the
+// "studio" deployment, where only a signed-in admin sees it). Dropped from the normal production build.
+const PaletteEditor =
+  import.meta.env.DEV || import.meta.env.VITE_PALETTE_EDITOR === 'true' ? lazy(() => import('./components/dev/PaletteEditor')) : null
 
 export default function App() {
   useSmoothAnchors({ offset: 72 })

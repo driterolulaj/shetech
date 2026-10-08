@@ -4,16 +4,25 @@ import { cn } from '../../lib/cn'
 import { applyPalette, deriveAccent, deriveLogo, isHexColor, MESH_SIZE, PALETTE_GROUPS, parseHex, toHex } from '../../lib/palette'
 import { setRandomizerPaused } from '../../lib/paletteRandomizer'
 import { setThemePreference, useTheme } from '../../lib/theme'
+import { SITE } from '../../config/site'
 
 /**
- * Colour scheme editor (development only; not part of the production build).
+ * Colour scheme editor (development, and the studio deployment built with
+ * VITE_PALETTE_EDITOR=true; not part of the normal production build).
  *
  * Changes preview live. "Save" writes src/config/palette.json, which is what the
  * site is built from. "Reset" restores src/config/palette.defaults.json.
  * Templates are named palettes in src/config/palettes/<name>.json: pick one to
  * preview it, then "Save to file" to make it the site's palette.
+ *
+ * In development the files are written by the dev server (/__palette). On a deployed
+ * site the API commits them to GitHub (/api/admin/palette, signed-in admins only),
+ * and the site rebuilds with them; for anyone else the editor stays hidden.
  */
-const API = '/__palette'
+const DEPLOYED = !import.meta.env.DEV
+const API = DEPLOYED ? `${SITE.apiUrl}/api/admin/palette` : '/__palette'
+const FETCH_OPTIONS = DEPLOYED ? { credentials: SITE.apiUrl ? 'include' : 'same-origin', headers: { 'X-Admin': '1' } } : { headers: {} }
+const REBUILD = 'The site rebuilds with it in about a minute.'
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 const slug = (name) =>
   name
@@ -109,8 +118,12 @@ export default function PaletteEditor() {
   const resetTimer = useRef(0)
 
   useEffect(() => {
-    fetch(API)
-      .then((r) => r.json())
+    fetch(API, FETCH_OPTIONS)
+      .then((r) => {
+        // Deployed: not signed in as an admin, so there's no editor
+        if (DEPLOYED && r.status === 401) throw Object.assign(new Error(), { hidden: true })
+        return r.json().then((json) => (r.ok ? json : Promise.reject(new Error(json.error))))
+      })
       .then(({ palette, defaults, templates, randomizer }) => {
         setSaved(palette)
         setDefaults(defaults)
@@ -119,7 +132,11 @@ export default function PaletteEditor() {
         setRandomizer(randomizer)
         setRandomDraft(randomizer)
       })
-      .catch(() => setMessage({ tone: 'error', text: 'Could not reach the dev server.' }))
+      .catch((err) => {
+        if (err.hidden) return
+        // Nothing to edit without the saved colours; log why instead of showing a broken panel
+        console.warn('[colours]', err.message || (DEPLOYED ? 'Could not reach the API.' : 'Could not reach the dev server.'))
+      })
     return () => window.clearTimeout(resetTimer.current)
   }, [])
 
@@ -155,7 +172,12 @@ export default function PaletteEditor() {
   const setMesh = (i, value) => update({ mesh: colors.mesh.map((c, j) => (j === i ? value : c)) })
 
   const request = async (method, path = '', body) => {
-    const res = await fetch(API + path, { method, headers: { 'Content-Type': 'application/json' }, body: body && JSON.stringify(body) })
+    const res = await fetch(API + path, {
+      ...FETCH_OPTIONS,
+      method,
+      headers: { ...FETCH_OPTIONS.headers, 'Content-Type': 'application/json' },
+      body: body && JSON.stringify(body),
+    })
     const json = await res.json()
     if (!res.ok) throw new Error(json.error || `Request failed (${res.status})`)
     return json
@@ -165,7 +187,7 @@ export default function PaletteEditor() {
     try {
       const { palette } = await request('PUT', '', draft)
       setSaved(palette)
-      setMessage({ tone: 'ok', text: 'Saved to src/config/palette.json' })
+      setMessage({ tone: 'ok', text: DEPLOYED ? `Saved. ${REBUILD}` : 'Saved to src/config/palette.json' })
     } catch (err) {
       setMessage({ tone: 'error', text: err.message })
     }
@@ -183,7 +205,7 @@ export default function PaletteEditor() {
       const { palette } = await request('POST', '/reset')
       setSaved(palette)
       setDraft(palette)
-      setMessage({ tone: 'ok', text: 'Restored the default colours and saved.' })
+      setMessage({ tone: 'ok', text: `Restored the default colours and saved.${DEPLOYED ? ` ${REBUILD}` : ''}` })
     } catch (err) {
       setMessage({ tone: 'error', text: err.message })
     }
@@ -217,8 +239,14 @@ export default function PaletteEditor() {
 
   const saveRandomizer = async () => {
     try {
-      await request('PUT', '/randomizer', randomDraft)
-      setMessage({ tone: 'ok', text: 'Randomizer saved. Reloading…' }) // the dev server reloads the page
+      const { randomizer: next } = await request('PUT', '/randomizer', randomDraft)
+      if (DEPLOYED) {
+        setRandomizer(next)
+        setRandomDraft(next)
+        setMessage({ tone: 'ok', text: `Randomizer saved. ${REBUILD}` })
+      } else {
+        setMessage({ tone: 'ok', text: 'Randomizer saved. Reloading…' }) // the dev server reloads the page
+      }
     } catch (err) {
       setMessage({ tone: 'error', text: err.message })
     }
@@ -278,7 +306,7 @@ export default function PaletteEditor() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-lg font-light tracking-tight text-ink">Colour scheme</h2>
-              <p className="mt-0.5 text-xs text-ink-3">Only visible while running npm run dev.</p>
+              <p className="mt-0.5 text-xs text-ink-3">{DEPLOYED ? 'Saving updates the live site.' : 'Only visible while running npm run dev.'}</p>
             </div>
             <button
               type="button"
