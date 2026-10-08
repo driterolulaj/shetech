@@ -23,7 +23,14 @@ async function request(method, path, body) {
   if (res.status === 404 && method === 'GET') return null
   const json = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const reason = res.status === 409 || res.status === 422 ? 'it was changed elsewhere; reload and try again' : json.message || res.status
+    const reason =
+      res.status === 409 || res.status === 422
+        ? 'it was changed elsewhere; reload and try again'
+        : res.status === 401
+          ? 'GITHUB_TOKEN is invalid or expired'
+          : res.status === 403
+            ? `GITHUB_TOKEN can't write to ${github.repo} (it needs Contents: Read and write)`
+            : json.message || res.status
     throw Object.assign(new Error(`GitHub: ${reason}`), { status: 502 })
   }
   return json

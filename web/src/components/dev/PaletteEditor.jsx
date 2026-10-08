@@ -113,6 +113,7 @@ export default function PaletteEditor() {
   const [logoFollows, setLogoFollows] = useState(true)
   const [confirmReset, setConfirmReset] = useState(false)
   const [message, setMessage] = useState(null) // { tone: 'ok' | 'error', text }
+  const [loadError, setLoadError] = useState(null) // why the saved colours couldn't be loaded
   const [randomizer, setRandomizer] = useState(null) // saved settings
   const [randomDraft, setRandomDraft] = useState(null) // settings being edited
   const resetTimer = useRef(0)
@@ -134,8 +135,7 @@ export default function PaletteEditor() {
       })
       .catch((err) => {
         if (err.hidden) return
-        // Nothing to edit without the saved colours; log why instead of showing a broken panel
-        console.warn('[colours]', err.message || (DEPLOYED ? 'Could not reach the API.' : 'Could not reach the dev server.'))
+        setLoadError(err.message || (DEPLOYED ? 'Could not reach the API.' : 'Could not reach the dev server.'))
       })
     return () => window.clearTimeout(resetTimer.current)
   }, [])
@@ -154,7 +154,18 @@ export default function PaletteEditor() {
   const atDefaults = useMemo(() => draft && defaults && same(draft, defaults), [draft, defaults])
   const current = useMemo(() => templates.find((t) => same(t.palette, draft)), [templates, draft]) // template on screen, if any
 
-  if (!draft) return null
+  // Nothing to edit without the saved colours: say why rather than vanish
+  if (!draft) {
+    return loadError ? (
+      <p
+        role="status"
+        className="liquid-glass fixed bottom-4 right-4 z-[60] flex max-w-[min(calc(100vw-2rem),23rem)] items-start gap-2 rounded-sm px-3.5 py-2.5 text-[13px] text-ink [--glass-a:0.85] [--glass-b:0.7]"
+      >
+        <Palette className="mt-0.5 size-4 shrink-0 text-danger" strokeWidth={1.75} />
+        <span>Colours unavailable: {loadError}</span>
+      </p>
+    ) : null
+  }
   const colors = draft[theme]
 
   const update = (patch) => {

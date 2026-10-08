@@ -9,9 +9,7 @@
     <!-- Same theme bootstrap as index.html (no flash) -->
     <script>
       try {
-        var t = localStorage.getItem('theme')
-        var dark = t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'
       } catch (e) {}
     </script>
   </head>

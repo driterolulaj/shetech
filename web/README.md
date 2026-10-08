@@ -133,4 +133,4 @@ In the colour editor, **Follow the accent colour** (under Logo) recolours the lo
 
 ## Themes
 
-The site follows the visitor's system setting until they use the sun/moon toggle; their choice is remembered. Components only use semantic tokens (`bg-surface`, `text-ink`, `border-line`, `bg-accent-wash`…), so a palette change updates everything.
+The site starts in the light theme; the sun/moon toggle switches to dark, and that choice is remembered. Components only use semantic tokens (`bg-surface`, `text-ink`, `border-line`, `bg-accent-wash`…), so a palette change updates everything.

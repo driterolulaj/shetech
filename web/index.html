@@ -6,14 +6,11 @@
     <title>She Tech | AI that takes repetitive work off your plate</title>
     <meta name="description" content="She Tech builds AI solutions, automation and custom software that take repetitive work off your team's plate: contracts read, invoices sent, data moved, with people reviewing what matters." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b1222" media="(prefers-color-scheme: dark)" />
-    <!-- Apply the saved/system theme before first paint (no flash). Kept in sync by src/lib/theme.js -->
+    <meta name="theme-color" content="#ffffff" />
+    <!-- Apply the theme before first paint (no flash): light unless dark was picked. Kept in sync by src/lib/theme.js -->
     <script>
       try {
-        var t = localStorage.getItem('theme')
-        var dark = t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'
       } catch (e) {}
     </script>
   </head>

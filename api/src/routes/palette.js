@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { RANDOMIZER_DEFAULTS, validatePalette, validateRandomizer, withDefaults } from '../../../web/src/lib/palette.js'
+import { config } from '../config.js'
 import { deleteFile, githubConfigured, listFiles, readFile, writeFile } from '../lib/github.js'
 
 /**
@@ -30,7 +31,7 @@ const readJson = async (path) => {
 }
 
 paletteRouter.use((_req, res, next) =>
-  githubConfigured ? next() : res.status(503).json({ error: 'Saving colours needs GITHUB_TOKEN on this deployment.' }),
+  githubConfigured ? next() : res.status(503).json({ error: "set GITHUB_TOKEN (and GITHUB_REPO if this deployment isn't from GitHub) on this project, then redeploy." }),
 )
 
 /** Every valid template, A–Z, with missing tokens filled from the defaults (as in vite.config.js). */
@@ -63,6 +64,11 @@ const BAD_NAME = { error: 'Use lowercase letters, numbers and dashes for the nam
 
 paletteRouter.get('/', async (_req, res) => {
   const [defaults, saved] = await Promise.all([readJson(DEFAULTS), readJson(PALETTE)])
+  if (!defaults) {
+    // GitHub answers 404 for a repository the token can't see, too
+    const { repo, branch } = config.github
+    return res.status(502).json({ error: `Can't read ${DEFAULTS} in ${repo} (${branch}). Check that GITHUB_TOKEN has access to that repository.` })
+  }
   const [templates, randomizer] = await Promise.all([readTemplates(defaults), readRandomizer()])
   res.json({ palette: withDefaults(saved, defaults), defaults, templates, randomizer })
 })
@@ -104,4 +110,10 @@ paletteRouter.delete('/templates/:name', async (req, res) => {
   if (!name) return res.status(400).json(BAD_NAME)
   await deleteFile(`${TEMPLATES}/${name}.json`, `Colours: delete template "${name}" (${req.admin.email})`)
   res.json({ templates: await readTemplates(await readJson(DEFAULTS)) })
+})
+
+// Admin-only, so the real reason (e.g. GitHub refusing the token) is shown in the editor
+paletteRouter.use((err, _req, res, _next) => {
+  console.error('[palette]', err.message)
+  res.status(err.status ?? 500).json({ error: err.message })
 })
