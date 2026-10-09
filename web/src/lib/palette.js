@@ -139,6 +139,26 @@ export function paletteShiftCss(seconds) {
   return `${properties}:root.palette-shifting{transition-property:${COLOR_VARS.join(',')};transition-duration:${seconds}s;transition-timing-function:cubic-bezier(0.45,0,0.55,1)}`
 }
 
+/**
+ * The randomizer's part of a page's <head>: every template in the mix as CSS scoped to
+ * <html data-palette="…">, and a tiny script that picks one before the first paint (no
+ * flash of the base colours). The timed changes are done by src/lib/paletteRandomizer.js,
+ * which reads `window.__paletteRandomizer`. Null when the randomizer is off.
+ * `templates` are { name, palette }. Used by the build (vite.config.js) and the API (/api/palette.js).
+ */
+export function randomizerHead(templates, { onRefresh, everySeconds, fadeSeconds, exclude }) {
+  if (!onRefresh && !everySeconds) return null
+  const pool = templates.filter((t) => !exclude.includes(t.name))
+  if (pool.length < 2) return null
+  const config = { names: pool.map((t) => t.name), onRefresh, everySeconds, fadeSeconds }
+  return {
+    // The drift CSS is only needed when the palette changes while you watch
+    css: (everySeconds && fadeSeconds ? paletteShiftCss(fadeSeconds) : '') + pool.map((t) => paletteToCss(t.palette, t.name)).join(''),
+    // Avoids repeating the previous visit's palette when there's a choice
+    script: `(function(){try{var c=${JSON.stringify(config)};window.__paletteRandomizer=c;if(!c.onRefresh)return;var k='palette:last',l=null;try{l=localStorage.getItem(k)}catch(e){}var n=c.names.filter(function(x){return x!==l});var p=n[Math.floor(Math.random()*n.length)];document.documentElement.setAttribute('data-palette',p);try{localStorage.setItem(k,p)}catch(e){}}catch(e){}})()`,
+  }
+}
+
 /** Returns an error message, or null when the palette is complete and valid. */
 export function validatePalette(palette) {
   for (const theme of THEMES) {

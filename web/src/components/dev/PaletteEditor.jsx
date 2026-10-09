@@ -16,13 +16,14 @@ import { SITE } from '../../config/site'
  * preview it, then "Save to file" to make it the site's palette.
  *
  * In development the files are written by the dev server (/__palette). On a deployed
- * site the API commits them to GitHub (/api/admin/palette, signed-in admins only),
- * and the site rebuilds with them.
+ * site they are saved in the database (/api/admin/palette, signed-in admins only)
+ * and visitors get them within seconds, without a rebuild (/api/palette.js).
  */
 const DEPLOYED = !import.meta.env.DEV
 const API = DEPLOYED ? `${SITE.apiUrl}/api/admin/palette` : '/__palette'
 const FETCH_OPTIONS = DEPLOYED ? { credentials: SITE.apiUrl ? 'include' : 'same-origin', headers: { 'X-Admin': '1' } } : { headers: {} }
-const REBUILD = 'The site rebuilds with it in about a minute.'
+const LIVE = 'Visitors see it within a few seconds.'
+const SAVE_LABEL = DEPLOYED ? 'Save' : 'Save to file'
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 const slug = (name) =>
   name
@@ -198,7 +199,7 @@ export default function PaletteEditor() {
     try {
       const { palette } = await request('PUT', '', draft)
       setSaved(palette)
-      setMessage({ tone: 'ok', text: DEPLOYED ? `Saved. ${REBUILD}` : 'Saved to src/config/palette.json' })
+      setMessage({ tone: 'ok', text: DEPLOYED ? `Saved. ${LIVE}` : 'Saved to src/config/palette.json' })
     } catch (err) {
       setMessage({ tone: 'error', text: err.message })
     }
@@ -216,7 +217,7 @@ export default function PaletteEditor() {
       const { palette } = await request('POST', '/reset')
       setSaved(palette)
       setDraft(palette)
-      setMessage({ tone: 'ok', text: `Restored the default colours and saved.${DEPLOYED ? ` ${REBUILD}` : ''}` })
+      setMessage({ tone: 'ok', text: `Restored the default colours and saved.${DEPLOYED ? ` ${LIVE}` : ''}` })
     } catch (err) {
       setMessage({ tone: 'error', text: err.message })
     }
@@ -233,7 +234,7 @@ export default function PaletteEditor() {
     setMessage(
       same(template.palette, saved)
         ? { tone: 'ok', text: `“${template.name}” is the live palette.` }
-        : { tone: 'info', text: `Previewing “${template.name}”. Save to file to make it the site's palette.` },
+        : { tone: 'info', text: `Previewing “${template.name}”. ${SAVE_LABEL} to make it the site's palette.` },
     )
   }
 
@@ -254,7 +255,7 @@ export default function PaletteEditor() {
       if (DEPLOYED) {
         setRandomizer(next)
         setRandomDraft(next)
-        setMessage({ tone: 'ok', text: `Randomizer saved. ${REBUILD}` })
+        setMessage({ tone: 'ok', text: `Randomizer saved. ${LIVE}` })
       } else {
         setMessage({ tone: 'ok', text: 'Randomizer saved. Reloading…' }) // the dev server reloads the page
       }
@@ -422,7 +423,7 @@ export default function PaletteEditor() {
                 {overwriting ? 'Update' : 'Save as template'}
               </button>
             </form>
-            <p className="mt-1.5 text-[11px] text-ink-3">Saves the light and dark colours to src/config/palettes/.</p>
+            <p className="mt-1.5 text-[11px] text-ink-3">{DEPLOYED ? 'Saves the light and dark colours as a template.' : 'Saves the light and dark colours to src/config/palettes/.'}</p>
           </section>
 
           {randomDraft && (
@@ -592,7 +593,7 @@ export default function PaletteEditor() {
               disabled={!dirty}
               className="inline-flex h-8 items-center gap-1.5 rounded-sm bg-accent px-3 text-[13px] font-medium text-white transition-colors duration-300 ease-soft hover:bg-accent-strong disabled:opacity-40"
             >
-              <Save className="size-3.5" strokeWidth={2} /> Save to file
+              <Save className="size-3.5" strokeWidth={2} /> {SAVE_LABEL}
             </button>
             <button
               type="button"

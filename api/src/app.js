@@ -3,6 +3,7 @@ import { config } from './config.js'
 import { pool } from './db/pool.js'
 import { adminRouter } from './routes/admin.js'
 import { contactRouter } from './routes/contact.js'
+import { paletteScript } from './routes/palette.js'
 
 /**
  * The HTTP API. Everything lives under /api so a reverse proxy can forward
@@ -45,6 +46,7 @@ export function createApp() {
       res.status(503).json({ ok: false, db: 'down' })
     }
   })
+  app.get('/api/palette.js', paletteScript)
   app.use('/api/contact', contactRouter)
   app.use('/api/admin', adminRouter)
 

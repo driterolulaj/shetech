@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { paletteShiftCss, paletteToCss, RANDOMIZER_DEFAULTS, validatePalette, validateRandomizer, withDefaults } from './src/lib/palette.js'
+import { paletteToCss, RANDOMIZER_DEFAULTS, randomizerHead, validatePalette, validateRandomizer, withDefaults } from './src/lib/palette.js'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const PALETTE = path.join(root, 'src/config/palette.json')
@@ -48,29 +48,13 @@ function readRandomizer() {
   }
 }
 
-/**
- * Randomizer tags for a page: every template in the mix as CSS scoped to
- * <html data-palette="…">, plus a tiny inline script that picks one before the
- * first paint (no flash of the base colours). The timed changes are done by
- * src/lib/paletteRandomizer.js, which reads `window.__paletteRandomizer`.
- */
+/** Randomizer tags for a page (see randomizerHead in src/lib/palette.js), or none while it's off. */
 function randomizerTags() {
-  const { onRefresh, everySeconds, fadeSeconds, exclude } = readRandomizer()
-  if (!onRefresh && !everySeconds) return []
-  const pool = readTemplates().filter((t) => !exclude.includes(t.name))
-  if (pool.length < 2) return []
-  const config = { names: pool.map((t) => t.name), onRefresh, everySeconds, fadeSeconds }
-  // Avoids repeating the previous visit's palette when there's a choice
-  const script = `(function(){try{var c=${JSON.stringify(config)};window.__paletteRandomizer=c;if(!c.onRefresh)return;var k='palette:last',l=null;try{l=localStorage.getItem(k)}catch(e){}var n=c.names.filter(function(x){return x!==l});var p=n[Math.floor(Math.random()*n.length)];document.documentElement.setAttribute('data-palette',p);try{localStorage.setItem(k,p)}catch(e){}}catch(e){}})()`
+  const head = randomizerHead(readTemplates(), readRandomizer())
+  if (!head) return []
   return [
-    {
-      tag: 'style',
-      attrs: { id: 'palette-templates' },
-      // The drift CSS is only needed when the palette changes while you watch
-      children: (everySeconds && fadeSeconds ? paletteShiftCss(fadeSeconds) : '') + pool.map((t) => paletteToCss(t.palette, t.name)).join(''),
-      injectTo: 'head',
-    },
-    { tag: 'script', children: script, injectTo: 'head' },
+    { tag: 'style', attrs: { id: 'palette-templates' }, children: head.css, injectTo: 'head' },
+    { tag: 'script', children: head.script, injectTo: 'head' },
   ]
 }
 
@@ -86,6 +70,9 @@ const readBody = (req) =>
  * Colour scheme plugin.
  *  - Injects src/config/palette.json as CSS variables into index.html (dev and build),
  *    so pages paint in the right colours immediately.
+ *  - Build only: adds <script src="/api/palette.js"> after them, which swaps in the colours
+ *    saved on the hosted site (database) before the first paint. The baked-in ones stay as
+ *    the fallback. Not in dev, where the editor works on the files.
  *  - Dev only: serves /__palette for the in-browser palette editor
  *  - Adds the palette randomizer to the site (not /admin) when it's switched on.
  *      GET                     → { palette, defaults, templates: [{ name, palette }], randomizer }
@@ -98,9 +85,14 @@ const readBody = (req) =>
  */
 function palettePlugin() {
   let lastWritten = null
+  let apiUrl = ''
 
   return {
     name: 'shetech-palette',
+
+    configResolved(config) {
+      apiUrl = (config.env.VITE_API_URL || '').replace(/\/+$/, '')
+    },
 
     transformIndexHtml(_html, ctx) {
       const palette = readPalette()
@@ -110,6 +102,8 @@ function palettePlugin() {
       return [
         { tag: 'style', attrs: { id: 'palette' }, children: paletteToCss(palette), injectTo: 'head' },
         ...(isAdmin ? [] : randomizerTags()),
+        // Render-blocking on purpose: the hosted site's saved colours apply before anything is drawn
+        ...(ctx.server ? [] : [{ tag: 'script', attrs: { src: `${apiUrl}/api/palette.js${isAdmin ? '?page=admin' : ''}` }, injectTo: 'head' }]),
       ]
     },
 

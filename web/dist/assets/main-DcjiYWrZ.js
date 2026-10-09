@@ -1,0 +1,1 @@
+import{A as e,O as t,j as n}from"./src-ThnBHUxG.js";import{n as r}from"./paletteRandomizer-BLrXKmzP.js";var i=n(),a=e(),o=t();(0,a.createRoot)(document.getElementById(`root`)).render((0,o.jsx)(i.StrictMode,{children:(0,o.jsx)(r,{})}));

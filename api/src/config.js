@@ -47,17 +47,6 @@ export const config = {
     senderName: env.MAIL_SENDER_NAME || 'She Tech',
   },
 
-  /**
-   * Colour editor on the live site (/admin/home): saves are committed here.
-   * GITHUB_TOKEN needs "Contents: read and write" on the repository. Repo and branch
-   * default to the ones Vercel deployed from.
-   */
-  github: {
-    token: env.GITHUB_TOKEN || '',
-    repo: env.GITHUB_REPO || (env.VERCEL_GIT_REPO_OWNER && env.VERCEL_GIT_REPO_SLUG ? `${env.VERCEL_GIT_REPO_OWNER}/${env.VERCEL_GIT_REPO_SLUG}` : ''),
-    branch: env.GITHUB_BRANCH || env.VERCEL_GIT_COMMIT_REF || 'main',
-  },
-
   admin: {
     /** First admin, created on start-up only while there are no admins yet. */
     seedEmail: env.ADMIN_EMAIL || '',

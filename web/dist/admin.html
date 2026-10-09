@@ -9,14 +9,14 @@
     <!-- Same theme bootstrap as index.html (no flash) -->
     <script>
       try {
-        var t = localStorage.getItem('theme')
-        var dark = t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'
       } catch (e) {}
     </script>
-    <script type="module" crossorigin src="/assets/admin-8MivJuVy.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/src-C1aVn8uv.js">
-    <link rel="stylesheet" crossorigin href="/assets/src-52mIrKVx.css">
+    <script type="module" crossorigin src="/assets/admin-tswlmcx0.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/src-ThnBHUxG.js">
+    <link rel="modulepreload" crossorigin href="/assets/trash-CxKYAin7.js">
+    <link rel="modulepreload" crossorigin href="/assets/api-Cui0_0bk.js">
+    <link rel="stylesheet" crossorigin href="/assets/src-DRq2GdFY.css">
     <style id="palette">:root{--accent:#2a9d8f;--accent-strong:#228175;--accent-wash:#f0f8f7;--secondary:#00d4ff;--ink:#0a2540;--ink-2:#425466;--ink-3:#8898aa;--surface:#f7f7ed;--canvas:#f8fafd;--line:#eef2f7;--line-strong:#e2e8f0;--line-hover:#cbd5e1;--logo-mark:#0a2540;--logo-primary:#2a9d8f;--logo-light:#5fb6ab;--logo-deep:#195e56;--success:#047857;--success-wash:#ecfdf5;--warn:#b45309;--warn-wash:#fffbeb;--danger:#be123c;--danger-wash:#fff1f2;--glass-rgb:255 255 255;--mesh-0:#264653;--mesh-1:#2a9d8f;--mesh-2:#e9c46a;--mesh-3:#f4a261;}[data-theme="dark"]{--accent:#2a9d8f;--accent-strong:#50afa3;--accent-wash:#2a9d8f24;--secondary:#e9c46a;--ink:#edf1f8;--ink-2:#a3afc4;--ink-3:#717f98;--surface:#061312;--canvas:#070c18;--line:#ffffff12;--line-strong:#ffffff1f;--line-hover:#ffffff38;--logo-mark:#fbfbfb;--logo-primary:#2a9d8f;--logo-light:#5fb6ab;--logo-deep:#195e56;--success:#34d399;--success-wash:#34d3991f;--warn:#fbbf24;--warn-wash:#fbbf241f;--danger:#fb7185;--danger-wash:#fb71851f;--glass-rgb:15 23 44;--mesh-0:#264653;--mesh-1:#2a9d8f;--mesh-2:#e9c46a;--mesh-3:#f4a261;}</style>
   </head>
   <body>

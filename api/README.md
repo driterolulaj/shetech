@@ -14,7 +14,7 @@ On start-up the API applies any pending database migrations and, while there are
 | Command | Does |
 |---|---|
 | `npm run migrate` | Apply pending migrations without starting the server |
-| `npm run setup` | Migrations plus the first admin, without starting the server (the Vercel build runs this) |
+| `npm run setup` | Migrations, the first admin and (once) the colours, without starting the server (the Vercel build runs this) |
 | `npm run admin:create -- you@example.com` | Add an admin, or reset an admin's password (asks for it without echoing; signs them out everywhere) |
 
 ## Database
@@ -109,8 +109,6 @@ Good to know: `TRUST_PROXY` defaults to `1` on Vercel (its edge sets the real cl
 
 `/admin/home` shows the home page exactly as visitors see it, plus the **Colours** editor (see *Colours* in `web/README.md`). Only signed-in admins get it: anyone else is sent to the sign-in at `/admin` and brought back afterwards. The dashboard links to it (**Colours**). The public home page never loads the editor.
 
-Saving there commits the palette files (`web/src/config/`) to GitHub, and the push makes Vercel rebuild the site with them (about a minute). For that, set on the Vercel project:
+Saving there stores the colours (palette, templates, randomizer) in the database: no commit, no rebuild. Every built page loads `/api/palette.js` in its `<head>`, a small render-blocking script that applies the saved colours before the first paint, so visitors see a change on their next page load. Vercel's CDN keeps that script until a save purges it (cache tag `palette`), so the database is read once per change or deploy, not on every visit. The colours baked into the build stay as the fallback if the API can't be reached.
 
-- `GITHUB_TOKEN`: a [fine-grained token](https://github.com/settings/personal-access-tokens/new) for this repository only, with *Contents: Read and write*. The repository and branch default to the ones Vercel deploys from (`GITHUB_REPO` / `GITHUB_BRANCH` override them).
-
-Without it, `/admin/home` shows "Colours unavailable" with the reason instead of the editor. Commit messages carry the admin's email; run `git pull` before your next local change. The editor's requests go to `/api/admin/palette` (`src/routes/palette.js`).
+The first `npm run setup` (the first deploy) copies `web/src/config/` into the database; after that the hosted site's colours are only changed at `/admin/home`, and deploys don't overwrite them. The files are still what `npm run dev` uses, and what a fresh database starts from. The code is in `src/routes/palette.js` and `src/db/palette.js`.
