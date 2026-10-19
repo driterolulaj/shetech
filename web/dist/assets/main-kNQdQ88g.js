@@ -1,0 +1,1 @@
+import{A as e,O as t,j as n}from"./src-BAH3jsFu.js";import{n as r}from"./paletteRandomizer-BAsHM-Bl.js";var i=n(),a=e(),o=t();(0,a.createRoot)(document.getElementById(`root`)).render((0,o.jsx)(i.StrictMode,{children:(0,o.jsx)(r,{})}));

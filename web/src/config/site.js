@@ -9,8 +9,8 @@ export const SITE = {
   name: 'She Tech',
   tagline: 'AI solutions, automation & custom software.',
 
-  /** Shown on the page and used for mailto links. Hidden everywhere while empty. */
-  email: env.VITE_CONTACT_EMAIL || '',
+  /** Shown on the page and used for mailto links. */
+  email: env.VITE_CONTACT_EMAIL || 'info@shetech.co',
   responseTime: 'Within one business day',
 
   booking: {

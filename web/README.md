@@ -22,7 +22,7 @@ Copy `.env.example` to `.env.local` and fill in what you have. Everything here e
 
 | Variable | What it does | If empty |
 |---|---|---|
-| `VITE_CONTACT_EMAIL` | Address shown on the site and used for mailto links | Email rows are hidden |
+| `VITE_CONTACT_EMAIL` | Address shown on the site and used for mailto links | `info@shetech.co` |
 | `VITE_BOOKING_URL` | Scheduling page embedded by **Book a call** (Calendly, Cal.com, TidyCal, SavvyCal…) | Visitors get the built-in call-request form, handled in the admin panel |
 | `VITE_API_URL` | The API's address when it runs on its own host (e.g. `https://api.shetech.com`) | Same origin: `/api` on this site |
 | `VITE_FORM_ENDPOINT` | Send forms to [Formspree](https://formspree.io) / [Web3Forms](https://web3forms.com) instead of the API | The She Tech API |
