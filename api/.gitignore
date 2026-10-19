@@ -1,5 +1,5 @@
 node_modules/
-# Secrets (database, Gmail, admin password)
+# Secrets (database, email, admin password)
 .env
 .env.*
 !.env.example

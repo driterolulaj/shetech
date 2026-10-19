@@ -1,9 +1,9 @@
 # She Tech API
 
-The backend for the She Tech website: contact and booking forms, Gmail notifications and the bookings admin panel. Node 22.9+ (Express 5), PostgreSQL 14+ (Neon on Vercel).
+The backend for the She Tech website: contact and booking forms, email notifications (GoDaddy mailbox over SMTP) and the bookings admin panel. Node 22.9+ (Express 5), PostgreSQL 14+ (Neon on Vercel).
 
 ```bash
-cp .env.example .env    # fill in DB, Gmail and admin settings
+cp .env.example .env    # fill in DB, email (SMTP) and admin settings
 npm install
 npm run dev             # http://localhost:4000, restarts on file changes
 npm start               # production
@@ -93,7 +93,7 @@ The database can live on a third machine: point `DATABASE_URL` at it and allow t
 The database is **[Neon](https://neon.com) Postgres**, added from Vercel's Storage tab (free plan). Vercel then sets `DATABASE_URL` (and `DATABASE_URL_UNPOOLED`, used for migrations) on the project by itself.
 
 1. Push the repository to GitHub, then on Vercel: **Add New → Project**, import it, and leave the root directory as the repository root (the framework preset shows *Services*). Add these environment variables before deploying:
-   - `GMAIL_USER`, `GMAIL_APP_PASSWORD`, optionally `MAIL_TO`
+   - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` (the GoDaddy mailbox, see `.env.example`), optionally `MAIL_TO`
    - `ADMIN_EMAIL`, `ADMIN_PASSWORD` (first admin)
    - `PUBLIC_URL=https://<your-project>.vercel.app` (or your domain), for the admin link in emails
    - the website's `VITE_*` settings (see `web/.env.example`; leave `VITE_API_URL` empty)

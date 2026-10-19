@@ -50,7 +50,7 @@ export async function setup() {
     }
   }
   await seedColours()
-  if (!mailConfigured) console.warn('[mail] GMAIL_USER / GMAIL_APP_PASSWORD not set: submissions are saved but not emailed')
+  if (!mailConfigured) console.warn('[mail] SMTP_HOST / SMTP_USER / SMTP_PASSWORD not set: submissions are saved but not emailed')
 }
 
 // `npm run setup`

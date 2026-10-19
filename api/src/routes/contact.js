@@ -82,7 +82,7 @@ contactRouter.post('/', async (req, res) => {
       })
       emailed = true
     } catch (err) {
-      console.error('[contact] Gmail send failed:', err.message)
+      console.error('[contact] Mail send failed:', err.message)
     }
   }
 

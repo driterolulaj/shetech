@@ -38,12 +38,17 @@ export const config = {
     max: Number(env.DB_POOL_SIZE) || 10,
   },
 
+  /**
+   * Outgoing mail over SMTP (the GoDaddy mailbox). GoDaddy Professional Email:
+   * smtpout.secureserver.net:465. Microsoft 365 from GoDaddy: smtp.office365.com:587.
+   */
   mail: {
-    user: env.GMAIL_USER || '',
-    // Google shows app passwords in groups of four; the spaces aren't part of it
-    pass: (env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, ''),
-    /** Where enquiries are delivered; defaults to the Gmail account. */
-    to: env.MAIL_TO || env.GMAIL_USER || '',
+    host: env.SMTP_HOST || '',
+    port: Number(env.SMTP_PORT) || 465,
+    user: env.SMTP_USER || '',
+    pass: env.SMTP_PASSWORD || '',
+    /** Where enquiries are delivered; defaults to the SMTP mailbox. */
+    to: env.MAIL_TO || env.SMTP_USER || '',
     senderName: env.MAIL_SENDER_NAME || 'She Tech',
   },
 

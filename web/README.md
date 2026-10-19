@@ -18,7 +18,7 @@ cd web && npm run dev    # website on :5173
 
 ## Contact & booking setup
 
-Copy `.env.example` to `.env.local` and fill in what you have. Everything here ends up in the public JavaScript, so **no secrets**: Gmail, database and admin credentials belong in `api/.env`.
+Copy `.env.example` to `.env.local` and fill in what you have. Everything here ends up in the public JavaScript, so **no secrets**: email, database and admin credentials belong in `api/.env`.
 
 | Variable | What it does | If empty |
 |---|---|---|

@@ -3,13 +3,27 @@ import { config } from '../config.js'
 
 const { mail } = config
 
-const transport = mail.user && mail.pass ? nodemailer.createTransport({ service: 'gmail', auth: { user: mail.user, pass: mail.pass } }) : null
+// Port 465 is TLS from the start; 587 upgrades with STARTTLS, which we insist on.
+// Short timeouts so a mail server that doesn't answer can't hold a serverless function open.
+const transport =
+  mail.host && mail.user && mail.pass
+    ? nodemailer.createTransport({
+        host: mail.host,
+        port: mail.port,
+        secure: mail.port === 465,
+        requireTLS: mail.port !== 465,
+        auth: { user: mail.user, pass: mail.pass },
+        connectionTimeout: 10_000,
+        greetingTimeout: 10_000,
+        socketTimeout: 20_000,
+      })
+    : null
 
 export const mailConfigured = Boolean(transport)
 
-/** Sends from the Gmail account. Throws if mail isn't configured or Gmail refuses. */
+/** Sends from the SMTP mailbox. Throws if mail isn't configured or the server refuses. */
 export function sendMail({ fromName = mail.senderName, ...options }) {
-  if (!transport) throw new Error('Gmail is not configured (GMAIL_USER / GMAIL_APP_PASSWORD).')
+  if (!transport) throw new Error('Mail is not configured (SMTP_HOST / SMTP_USER / SMTP_PASSWORD).')
   return transport.sendMail({ from: { name: fromName, address: mail.user }, ...options })
 }
 
